@@ -1,0 +1,4 @@
+atlalign==0.5.1
+dvc==2.0.18
+Pillow==8.2.0
+requests==2.25.1

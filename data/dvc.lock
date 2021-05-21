@@ -1,0 +1,35 @@
+schema: '2.0'
+stages:
+  download_coronal_dataset@0:
+    cmd: python download_coronal_dataset.py 100142290 2
+    deps:
+    - path: download_coronal_dataset.py
+      md5: 21cc7526a244b4160404384bf10c4b4f
+      size: 3158
+    outs:
+    - path: coronal/2/dataset_100142290/
+      md5: b44f34dd0a3bebd523d8e98feaf355c3.dir
+      size: 2207522409
+      nfiles: 5
+  download_coronal_dataset@2:
+    cmd: python download_coronal_dataset.py 100141805 2
+    deps:
+    - path: download_coronal_dataset.py
+      md5: 21cc7526a244b4160404384bf10c4b4f
+      size: 3158
+    outs:
+    - path: coronal/2/dataset_100141805/
+      md5: 93d7242e0511085f66a73b55d421952a.dir
+      size: 2227367321
+      nfiles: 5
+  download_coronal_dataset@1:
+    cmd: python download_coronal_dataset.py 100142355 2
+    deps:
+    - path: download_coronal_dataset.py
+      md5: 21cc7526a244b4160404384bf10c4b4f
+      size: 3158
+    outs:
+    - path: coronal/2/dataset_100142355/
+      md5: 7e8086760ce69f537771909a315232f7.dir
+      size: 2087285219
+      nfiles: 5

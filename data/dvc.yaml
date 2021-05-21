@@ -1,0 +1,15 @@
+stages:
+  download_coronal_dataset:
+    foreach:
+      - dataset_id: 100142290
+        n_gene: 2
+      - dataset_id: 100142355
+        n_gene: 2
+      - dataset_id: 100141805
+        n_gene: 2
+    do:
+      cmd: python download_coronal_dataset.py ${item.dataset_id} ${item.n_gene}
+      deps:
+        - download_coronal_dataset.py
+      outs:
+        - coronal/${item.n_gene}/dataset_${item.dataset_id}/

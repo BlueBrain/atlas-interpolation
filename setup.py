@@ -1,8 +1,14 @@
 """The setup script."""
 from setuptools import find_packages, setup
 
-install_requires = []
+install_requires = ["numpy"]
 extras_require = {
+    "data": [
+        "atlalign",
+        "dvc[ssh]",
+        "pillow",
+        "requests",
+    ],
     "dev": [
         "bandit",
         "black",

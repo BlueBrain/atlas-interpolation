@@ -1,0 +1,4 @@
+['remote "gpfs_ssh"']
+    url = ssh://bbpv1.bbp.epfl.ch/gpfs/bbp.cscs.ch/data/project/proj101/dvc_remotes/atlas_interpolation/
+    ask_password = true
+    user = edelattr
