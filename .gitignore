@@ -9,6 +9,10 @@ __pycache__/
 .python-version
 /venv/
 
+# Build artifacts
+/build/
+/dist/
+
 # Egg files
 *.egg-info/
 .eggs

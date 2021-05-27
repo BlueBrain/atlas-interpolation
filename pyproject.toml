@@ -5,3 +5,6 @@ requires = [
     "setuptools_scm[toml]>=3.4",
     "wheel",
 ]
+
+[tool.black]
+exclude = "vendor"

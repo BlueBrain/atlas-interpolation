@@ -8,6 +8,8 @@ def test_version_exists():
     parts = atlinter.__version__.split(".")
 
     # Version has correct format
-    assert len(parts) == 3
+    # allow for an optional ".devXX" part for local testing
+    assert len(parts) in {3, 4}
     assert parts[0].isdecimal()  # major
     assert parts[1].isdecimal()  # minor
+    assert parts[2].isdecimal()  # patch

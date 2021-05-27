@@ -1,7 +1,11 @@
 """The setup script."""
 from setuptools import find_packages, setup
 
-install_requires = ["numpy"]
+install_requires = [
+    "numpy",
+    "torch",
+    "torchvision",
+]
 extras_require = {
     "data": [
         "atlalign",
@@ -13,8 +17,10 @@ extras_require = {
         "bandit",
         "black",
         "flake8",
+        "flake8-bugbear",
+        "flake8-comprehensions",
+        "flake8-docstrings",
         "isort",
-        "pydocstyle",
         "pytest",
         "pytest-cov",
         "tox",

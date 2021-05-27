@@ -13,16 +13,19 @@ stages:
 default:
   before_script:
     - pip install -U pip setuptools wheel
-    - pip install tox
     - python -V
 lint:
   stage: lint
   image: python:3.7
   script:
+    - pip install tox
     - tox -e lint
 pytest:
   stage: test
   image: python:3.7
   coverage: '/^TOTAL.+?(\d+\%)$/'
   script:
-    - tox -e py37
+    - pip install --no-cache-dir $(grep 'torch==' requirements.txt)
+    - pip install -r requirements.txt
+    - pip install ".[dev]"
+    - pytest
