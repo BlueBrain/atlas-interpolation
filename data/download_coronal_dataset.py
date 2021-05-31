@@ -76,7 +76,7 @@ def main():
     # the first slice and the highest p-value
     _, _, img_0, df_0 = dataset[0]
     img_0_reg = df_0.warp(img_0)
-    shape = (*img_0_reg.shape[:2], int(max(p_values) + 1))
+    shape = (int(max(p_values) + 1), *img_0_reg.shape[:2])
 
     if args.n_gene == "2":
         red_gene = np.zeros(shape)
@@ -86,9 +86,9 @@ def main():
         for _, p, img, df in dataset:
             section_number = int(p // 25)
             img_reg = df.warp(img)
-            red_gene[:, :, section_number] = img_reg[:, :, 0]
-            green_gene[:, :, section_number] = img_reg[:, :, 1]
-            blue_gene[:, :, section_number] = img_reg[:, :, 2]
+            red_gene[section_number, :, :] = img_reg[:, :, 0]
+            green_gene[section_number, :, :] = img_reg[:, :, 1]
+            blue_gene[section_number, :, :] = img_reg[:, :, 2]
             all_dfs.append(df)
 
         output_dir = pathlib.Path("coronal") / "2" / f"dataset_{dataset_id}"
