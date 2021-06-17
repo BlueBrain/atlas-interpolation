@@ -1,4 +1,4 @@
-"""Download data from Allen Brain."""
+"""Download special dataset (with 2 genes) from Allen Brain."""
 import argparse
 import pathlib
 import sys
@@ -16,7 +16,6 @@ def parse_args():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("dataset_id")
-    parser.add_argument("n_gene")
     args = parser.parse_args()
 
     return args
@@ -51,7 +50,7 @@ def main():
 
     import numpy as np
     import PIL
-    from atlalign import allen
+    from atlutils.sync import download_dataset
 
     args = parse_args()
     # To avoid DecompressionBombError --> highest value from 3 datasets we are using
@@ -61,7 +60,7 @@ def main():
     dataset_id = args.dataset_id
     dataset_info = allen_dataset_info(dataset_id)
     dataset_info["dataset_id"] = dataset_id
-    dataset = list(allen.download_dataset(dataset_id))
+    dataset = list(download_dataset(dataset_id))
     dataset_info["num_images"] = len(dataset)
     # dataset = sequence of (image_id, p, img, df)
 
@@ -78,27 +77,26 @@ def main():
     img_0_reg = df_0.warp(img_0)
     shape = (int(max(p_values) + 1), *img_0_reg.shape[:2])
 
-    if args.n_gene == "2":
-        red_gene = np.zeros(shape)
-        green_gene = np.zeros(shape)
-        blue_gene = np.zeros(shape)
-        all_dfs = []
-        for _, p, img, df in dataset:
-            section_number = int(p // 25)
-            img_reg = df.warp(img)
-            red_gene[section_number, :, :] = img_reg[:, :, 0]
-            green_gene[section_number, :, :] = img_reg[:, :, 1]
-            blue_gene[section_number, :, :] = img_reg[:, :, 2]
-            all_dfs.append(df)
+    red_gene = np.zeros(shape)
+    green_gene = np.zeros(shape)
+    blue_gene = np.zeros(shape)
+    all_dfs = []
+    for _, p, img, df in dataset:
+        section_number = int(p // 25)
+        img_reg = df.warp(img)
+        red_gene[section_number, :, :] = img_reg[:, :, 0]
+        green_gene[section_number, :, :] = img_reg[:, :, 1]
+        blue_gene[section_number, :, :] = img_reg[:, :, 2]
+        all_dfs.append(df)
 
-        output_dir = pathlib.Path("coronal") / "2" / f"dataset_{dataset_id}"
-        output_dir.mkdir(parents=True)
-        np.save(output_dir / dataset_info["red_channel"], red_gene)
-        np.save(output_dir / dataset_info["green_channel"], green_gene)
-        np.save(output_dir / dataset_info["blue_channel"], blue_gene)
-        np.save(output_dir / "dfs.npy", np.stack(all_dfs))
-        with open(output_dir / "metadata.json", "w") as f:
-            f.write(json.dumps(dataset_info))
+    output_dir = pathlib.Path("special_volumes") / f"dataset_{dataset_id}"
+    output_dir.mkdir(parents=True)
+    np.save(output_dir / dataset_info["red_channel"], red_gene)
+    np.save(output_dir / dataset_info["green_channel"], green_gene)
+    np.save(output_dir / dataset_info["blue_channel"], blue_gene)
+    np.save(output_dir / "dfs.npy", np.stack(all_dfs))
+    with open(output_dir / "metadata.json", "w") as f:
+        json.dump(dataset_info, f)
 
 
 if __name__ == "__main__":
