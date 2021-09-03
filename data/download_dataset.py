@@ -46,7 +46,7 @@ def postprocess_dataset(dataset):
 
     for img_id, section_coordinate, img, df in dataset:
         if section_coordinate is None:
-            # In `atlutils.sync.download_dataset` if there is a problem during the download
+            # In `atldld.sync.download_dataset` if there is a problem during the download
             # the generator returns `(img_id, None, None, None, None)
             # TODO: maybe notify the user somehow?
             continue
@@ -70,8 +70,8 @@ def main():
     # Imports
     import json
 
-    from atlutils.sync import download_dataset
-    from atlutils.utils import CommonQueries, get_experiment_list_from_gene
+    from atldld.sync import download_dataset
+    from atldld.utils import CommonQueries, get_experiment_list_from_gene
 
     args = parse_args()
     gene = args.gene_name

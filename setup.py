@@ -9,7 +9,7 @@ install_requires = [
 ]
 extras_require = {
     "data": [
-        "atlutils @ git+https://bbpgitlab.epfl.ch/ml/atlas-data-utils.git",
+        "atldld==0.2.2",
         "dvc[ssh]",
         "pillow",
         "requests",

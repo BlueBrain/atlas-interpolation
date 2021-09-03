@@ -50,7 +50,7 @@ def main():
 
     import numpy as np
     import PIL
-    from atlutils.sync import download_dataset
+    from atldld.sync import download_dataset
 
     args = parse_args()
     # To avoid DecompressionBombError --> highest value from 3 datasets we are using
