@@ -2,12 +2,18 @@
 from setuptools import find_packages, setup
 
 install_requires = [
+    "mxnet",
     "numpy",
     "pytorch-fid",
+    "pyyaml",
+    "scipy",
     "torch",
     "torchvision",
 ]
 extras_require = {
+    "cupy": [
+        "cupy",
+    ],
     "data": [
         "atldld==0.2.2",
         "dvc[ssh]",
@@ -25,6 +31,11 @@ extras_require = {
         "pytest",
         "pytest-cov",
         "tox",
+    ],
+    "optical": [
+        "opencv-python",
+        "flow_vis",
+        "moviepy",
     ],
 }
 

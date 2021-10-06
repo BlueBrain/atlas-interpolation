@@ -1,0 +1,4 @@
+outs:
+- md5: c096c821ff3f52957c633eb3cb56fcd8
+  size: 82646478
+  path: maskflownet.params

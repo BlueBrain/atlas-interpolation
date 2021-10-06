@@ -1,0 +1,5 @@
+outs:
+- md5: 5193ac2be496b2ca7b892fd33d668c81.dir
+  size: 170394231
+  nfiles: 6
+  path: RAFT
