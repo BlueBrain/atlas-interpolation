@@ -17,16 +17,6 @@ CAIN_SHA=fff8fc321c5a76904ed2a12c9500e055d4c77256
 CAIN_SOURCE_DIR='model/*'
 CAIN_TARGET_DIR=cain
 
-PWC_URL=https://github.com/sniklaus/pytorch-pwc.git
-PWC_SHA=b638427cc9aad4bc20d01d50a16095a29cef3c75
-PWC_SOURCE_DIR='correlation/:run.py'
-PWC_TARGET_DIR=PWC
-
-LITEFLOW_URL=https://github.com/sniklaus/pytorch-liteflownet.git
-LITEFLOW_SHA=0af884b59e5692544e6172109520a2da2dd79e08
-LITEFLOW_SOURCE_DIR='correlation/:run.py'
-LITEFLOW_TARGET_DIR=LiteFlowNet
-
 MASKFLOWNET_URL=https://github.com/microsoft/MaskFlownet.git
 MASKFLOWNET_SHA=5cba12772e2201f0d1c1e27161d224e585334571
 MASKFLOWNET_SOURCE_DIR='predict_new_data.py:path.py:logger.py:network'
@@ -83,9 +73,7 @@ do_vendor $RIFE_URL $RIFE_SHA $RIFE_SOURCE_DIR $RIFE_TARGET_DIR
 do_vendor $CAIN_URL $CAIN_SHA $CAIN_SOURCE_DIR $CAIN_TARGET_DIR
 
 # Optical Flow
-do_vendor $PWC_URL $PWC_SHA $PWC_SOURCE_DIR $PWC_TARGET_DIR
 do_vendor $RAFT_URL $RAFT_SHA $RAFT_SOURCE_DIR $RAFT_TARGET_DIR
-do_vendor $LITEFLOW_URL $LITEFLOW_SHA $LITEFLOW_SOURCE_DIR $LITEFLOW_TARGET_DIR
 do_vendor $MASKFLOWNET_URL $MASKFLOWNET_SHA $MASKFLOWNET_SOURCE_DIR $MASKFLOWNET_TARGET_DIR
 
 # In RIFE source files absolute imports need to be replaced by relative imports, e.g.

@@ -11,9 +11,6 @@ install_requires = [
     "torchvision",
 ]
 extras_require = {
-    "cupy": [
-        "cupy",
-    ],
     "data": [
         "atldld==0.2.2",
         "dvc[ssh]",
