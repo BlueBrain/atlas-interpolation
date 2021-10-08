@@ -1,10 +1,16 @@
 """Volume interpolation based on pairwise interpolation between slices."""
+from __future__ import annotations
+
 import warnings
 from abc import ABC, abstractmethod
+from math import ceil, log2
 
 import numpy as np
 import torch
 from torchvision.transforms import ToTensor
+
+from atlinter.data import GeneDataset
+from atlinter.utils import find_closest
 
 
 class PairInterpolationModel(ABC):
@@ -380,3 +386,186 @@ class PairInterpolate:
         right_images = self._repeated_interpolation(img_mid, img2, model, n_repeat - 1)
 
         return [*left_images, img_mid, *right_images]
+
+
+class GeneInterpolate:
+    """Interpolation of a gene dataset.
+
+    Parameters
+    ----------
+    gene_data : GeneData
+        Gene Dataset to interpolate. It contains a `volume` of reference shape
+        with all known places located at the right place and a `metadata` dictionary
+        containing information about the axis of the dataset and the section numbers.
+
+    model : PairInterpolationModel
+        Pair-interpolation model.
+    """
+
+    def __init__(
+        self,
+        gene_data: GeneDataset,
+        model: PairInterpolationModel,
+    ):
+        self.gene_data = gene_data
+        self.model = model
+
+        self.axis = self.gene_data.axis
+        self.gene_volume = self.gene_data.volume.copy()
+        # If sagittal axis, put the sagittal dimension first
+        if self.axis == "sagittal":
+            self.gene_volume = np.transpose(self.gene_volume, (2, 0, 1, 3))
+
+    def get_interpolation(self, left: int, right: int) -> tuple[np.ndarray, np.ndarray]:
+        """Compute the interpolation for a pair of images.
+
+        Parameters
+        ----------
+        left
+            Slice number of the left image to consider.
+        right
+            Slice number of the right image to consider.
+
+        Returns
+        -------
+        interpolated_images : np.array
+            Interpolated image for the given pair of images.
+            Array of shape (N, dim1, dim2, 3) with N the number of
+            interpolated images.
+        predicted_section_numbers : np.array
+            Slice value of the predicted images.
+            Array of shape (N, 1) with N the number of interpolated images.
+        """
+        diff = right - left
+        n_repeat = self.get_n_repeat(diff)
+
+        pair_interpolate = PairInterpolate(n_repeat=n_repeat)
+        interpolated_images = pair_interpolate(
+            self.gene_volume[left], self.gene_volume[right], self.model
+        )
+        predicted_section_numbers = self.get_predicted_section_numbers(
+            left, right, n_repeat
+        )
+        return interpolated_images, predicted_section_numbers
+
+    def get_all_interpolation(self) -> tuple[np.ndarray, np.ndarray]:
+        """Compute pair interpolation for the entire volume.
+
+        Returns
+        -------
+        all_interpolated_images : np.array
+            Interpolated image for the entire volume.
+            Array of shape (N, dim1, dim2, 3) with N the number of
+            interpolated images.
+        all_predicted_section_numbers : np.array
+            Slice value of the predicted images.
+            Array of shape (N, 1) with N the number of interpolated images.
+        """
+        # TODO: Try to change the implementation of the prediction so that
+        # we do not predict slices that are not needed.
+        known_slices = sorted(self.gene_data.known_slices)
+
+        all_interpolated_images = []
+        all_predicted_section_numbers = []
+        for i in range(len(known_slices) - 1):
+            left, right = known_slices[i], known_slices[i + 1]
+            (
+                interpolated_images,
+                predicted_section_numbers,
+            ) = self.get_interpolation(left, right)
+            all_interpolated_images.append(interpolated_images)
+            all_predicted_section_numbers.append(predicted_section_numbers)
+
+        all_interpolated_images = np.concatenate(all_interpolated_images)
+        all_predicted_section_numbers = np.concatenate(all_predicted_section_numbers)
+        return all_interpolated_images, all_predicted_section_numbers
+
+    def predict_slice(self, slice_number: int) -> np.ndarray:
+        """Predict one gene slice.
+
+        Parameters
+        ----------
+        slice_number
+            Slice section to predict.
+
+        Returns
+        -------
+        np.array
+            Predicted gene slice. Array of shape (dim1, dim2, 3)
+            being (528, 320) for sagittal dataset and
+            (320, 456) for coronal dataset.
+        """
+        left, right = self.gene_data.get_surrounding_slices(slice_number)
+
+        if left is None:
+            return self.gene_volume[right]
+        elif right is None:
+            return self.gene_volume[left]
+        else:
+            interpolated_images, predicted_section_numbers = self.get_interpolation(
+                left, right
+            )
+            index = find_closest(slice_number, predicted_section_numbers)[0]
+            return interpolated_images[index]
+
+    def predict_volume(self) -> np.ndarray:
+        """Predict entire volume with known gene slices.
+
+        This function might be slow.
+        """
+        volume_shape = self.gene_data.volume_shape
+        volume = np.zeros(volume_shape)
+
+        if self.gene_data.axis == "sagittal":
+            volume = np.transpose(volume, (2, 0, 1, 3))
+
+        # Get all the predictions
+        (
+            all_interpolated_images,
+            all_predicted_section_numbers,
+        ) = self.get_all_interpolation()
+
+        min_slice_number = min(self.gene_data.known_slices)
+        max_slice_number = max(self.gene_data.known_slices)
+        end = volume_shape[0] if self.gene_data.axis == "coronal" else volume_shape[2]
+
+        # Populate the volume
+        for slice_number in range(end):
+            # If the slice is known, just copy the gene.
+            if slice_number in self.gene_data.known_slices:
+                volume[slice_number] = self.gene_volume[slice_number]
+            # If the slice section is smaller than all known slice
+            # We copy-paste the smallest known slice.
+            elif slice_number < min_slice_number:
+                volume[slice_number] = self.gene_volume[min_slice_number]
+            # If the slice section is bigger than all known slice
+            # We copy-paste the biggest known slice.
+            elif slice_number > max_slice_number:
+                volume[slice_number] = self.gene_volume[max_slice_number]
+            # If the slice is surrounded by two known slice.
+            # Determine the prediction closest to the slice section.
+            else:
+                index = find_closest(slice_number, all_predicted_section_numbers)[0]
+                volume[slice_number] = all_interpolated_images[index]
+
+        if self.gene_data.axis == "sagittal":
+            volume = np.transpose(volume, (1, 2, 0, 3))
+
+        return volume
+
+    @staticmethod
+    def get_n_repeat(diff: int) -> int:
+        """Determine the number of repetitions to compute."""
+        if diff <= 0:
+            return 0
+        n_repeat = ceil(log2(diff))
+        return n_repeat
+
+    @staticmethod
+    def get_predicted_section_numbers(
+        left: int, right: int, n_repeat: int
+    ) -> np.ndarray:
+        """Get slice values of predicted images."""
+        n_steps = 2 ** n_repeat + 1
+        predicted_section_numbers = np.linspace(left, right, n_steps)
+        return predicted_section_numbers[1:-1]
