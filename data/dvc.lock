@@ -4,8 +4,8 @@ stages:
     cmd: python download_dataset.py Gfap
     deps:
     - path: download_dataset.py
-      md5: 2e7e3cc1c9ff1d22f5e1e1a7aab14897
-      size: 2873
+      md5: 2278ea97feabcf3b154c1b10327823c6
+      size: 2867
     outs:
     - path: coronal/Gfap
       md5: 46ca22af0a56aa84fea4c5eff02ebe9f.dir
@@ -19,8 +19,8 @@ stages:
     cmd: python download_dataset.py Aldh1l1
     deps:
     - path: download_dataset.py
-      md5: 2e7e3cc1c9ff1d22f5e1e1a7aab14897
-      size: 2873
+      md5: 2278ea97feabcf3b154c1b10327823c6
+      size: 2867
     outs:
     - path: coronal/Aldh1l1
       md5: ada7497bc3defeae1a8f77bdce47578e.dir
@@ -34,8 +34,8 @@ stages:
     cmd: python download_dataset.py Vip
     deps:
     - path: download_dataset.py
-      md5: 2e7e3cc1c9ff1d22f5e1e1a7aab14897
-      size: 2873
+      md5: 2278ea97feabcf3b154c1b10327823c6
+      size: 2867
     outs:
     - path: coronal/Vip
       md5: 1ac09416ccb5d78343210eadd79d6b2a.dir
@@ -49,8 +49,8 @@ stages:
     cmd: python download_dataset.py Tmem119
     deps:
     - path: download_dataset.py
-      md5: 2e7e3cc1c9ff1d22f5e1e1a7aab14897
-      size: 2873
+      md5: 2278ea97feabcf3b154c1b10327823c6
+      size: 2867
     outs:
     - path: coronal/Tmem119
       md5: d751713988987e9331980363e24189ce.dir
@@ -64,8 +64,8 @@ stages:
     cmd: python download_dataset.py S100b
     deps:
     - path: download_dataset.py
-      md5: 2e7e3cc1c9ff1d22f5e1e1a7aab14897
-      size: 2873
+      md5: 2278ea97feabcf3b154c1b10327823c6
+      size: 2867
     outs:
     - path: coronal/S100b
       md5: 10c3243c600ce698292f34ac997561f3.dir
@@ -79,8 +79,8 @@ stages:
     cmd: python download_dataset.py Pcnp
     deps:
     - path: download_dataset.py
-      md5: 2e7e3cc1c9ff1d22f5e1e1a7aab14897
-      size: 2873
+      md5: 2278ea97feabcf3b154c1b10327823c6
+      size: 2867
     outs:
     - path: coronal/Pcnp
       md5: d751713988987e9331980363e24189ce.dir
@@ -94,8 +94,8 @@ stages:
     cmd: python download_dataset.py Mbp
     deps:
     - path: download_dataset.py
-      md5: 2e7e3cc1c9ff1d22f5e1e1a7aab14897
-      size: 2873
+      md5: 2278ea97feabcf3b154c1b10327823c6
+      size: 2867
     outs:
     - path: coronal/Mbp
       md5: 7a2eb075a8dbe085e94f9442422e42ed.dir
@@ -109,8 +109,8 @@ stages:
     cmd: python download_dataset.py Cnp
     deps:
     - path: download_dataset.py
-      md5: 2e7e3cc1c9ff1d22f5e1e1a7aab14897
-      size: 2873
+      md5: 2278ea97feabcf3b154c1b10327823c6
+      size: 2867
     outs:
     - path: coronal/Cnp
       md5: 158c1cf5e62d3f1de15c63307faa10cf.dir
@@ -124,8 +124,8 @@ stages:
     cmd: python download_dataset.py Pvalb
     deps:
     - path: download_dataset.py
-      md5: 2e7e3cc1c9ff1d22f5e1e1a7aab14897
-      size: 2873
+      md5: 2278ea97feabcf3b154c1b10327823c6
+      size: 2867
     outs:
     - path: coronal/Pvalb
       md5: c92164ee9060ab05f7e22aa1653ce02c.dir
@@ -139,8 +139,8 @@ stages:
     cmd: python download_dataset.py Gad1
     deps:
     - path: download_dataset.py
-      md5: 2e7e3cc1c9ff1d22f5e1e1a7aab14897
-      size: 2873
+      md5: 2278ea97feabcf3b154c1b10327823c6
+      size: 2867
     outs:
     - path: coronal/Gad1
       md5: 4d347c87a26f165ad198409145739cd2.dir
@@ -154,8 +154,8 @@ stages:
     cmd: python download_dataset.py Sst
     deps:
     - path: download_dataset.py
-      md5: 2e7e3cc1c9ff1d22f5e1e1a7aab14897
-      size: 2873
+      md5: 2278ea97feabcf3b154c1b10327823c6
+      size: 2867
     outs:
     - path: coronal/Sst
       md5: fe8f1d13aaf3571112aa6955195ba8f9.dir
@@ -169,32 +169,336 @@ stages:
     cmd: python download_special_dataset.py 100142290
     deps:
     - path: download_special_dataset.py
-      md5: f92516d5eaee9dde7a94bf9d276c977c
-      size: 3052
+      md5: 979fce4c3cf4bf86a576a572444f4812
+      size: 3050
     outs:
     - path: special_volumes/dataset_100142290/
-      md5: 650ad0301dca856ab6c60ffb2a7c5bdd.dir
-      size: 2207522409
+      md5: 588c87d6ae94538b0482c070f6f2c0e2.dir
+      size: 2207522403
       nfiles: 5
   download_special_dataset@100142355:
     cmd: python download_special_dataset.py 100142355
     deps:
     - path: download_special_dataset.py
-      md5: f92516d5eaee9dde7a94bf9d276c977c
-      size: 3052
+      md5: 979fce4c3cf4bf86a576a572444f4812
+      size: 3050
     outs:
     - path: special_volumes/dataset_100142355/
-      md5: a8b7d7a9b120314759ef2516e96af97c.dir
-      size: 2087285219
+      md5: be26a006196740fb012b183e43a637d0.dir
+      size: 2087285213
       nfiles: 5
   download_special_dataset@100141805:
     cmd: python download_special_dataset.py 100141805
     deps:
     - path: download_special_dataset.py
-      md5: f92516d5eaee9dde7a94bf9d276c977c
-      size: 3052
+      md5: 979fce4c3cf4bf86a576a572444f4812
+      size: 3050
     outs:
     - path: special_volumes/dataset_100141805/
-      md5: de43f131f455c260c41be29e07d37b13.dir
-      size: 2227367321
+      md5: f7ec26648182bbf3b984699647373902.dir
+      size: 2227367315
       nfiles: 5
+  download-nissl:
+    cmd: wget http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/ara_nissl/ara_nissl_25.nrrd
+    outs:
+    - path: ara_nissl_25.nrrd
+      md5: f401225e3b161679be88bd702155a394
+      size: 136232577
+  align@Pcnp:
+    cmd: python align.py Pcnp
+    deps:
+    - path: align.py
+      md5: d2beddabe97a2251069806c7e040610b
+      size: 4780
+    - path: coronal/Pcnp
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: sagittal/Pcnp
+      md5: ddad55a979d1b22709abdedcbe618932.dir
+      size: 10138150
+      nfiles: 2
+    outs:
+    - path: aligned/coronal/Pcnp
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: aligned/sagittal/Pcnp
+      md5: 8fffc56e1c46aceb660609b443df9248.dir
+      size: 10138150
+      nfiles: 2
+  align@Sst:
+    cmd: python align.py Sst
+    deps:
+    - path: align.py
+      md5: d2beddabe97a2251069806c7e040610b
+      size: 4780
+    - path: coronal/Sst
+      md5: fe8f1d13aaf3571112aa6955195ba8f9.dir
+      size: 18386884
+      nfiles: 2
+    - path: sagittal/Sst
+      md5: 437b790d2394a9283282b6b2f9a9f2bb.dir
+      size: 10138172
+      nfiles: 2
+    outs:
+    - path: aligned/coronal/Sst
+      md5: 14cb31ce1771aa2eba8cedba410d23e4.dir
+      size: 18386884
+      nfiles: 2
+    - path: aligned/sagittal/Sst
+      md5: 422b204028a53001910c8dd0a1712b1b.dir
+      size: 10138172
+      nfiles: 2
+  align@Gad1:
+    cmd: python align.py Gad1
+    deps:
+    - path: align.py
+      md5: d2beddabe97a2251069806c7e040610b
+      size: 4780
+    - path: coronal/Gad1
+      md5: 4d347c87a26f165ad198409145739cd2.dir
+      size: 49907051
+      nfiles: 4
+    - path: sagittal/Gad1
+      md5: 53f161e1c9e1f5cad52bceb2ff449405.dir
+      size: 187555690
+      nfiles: 36
+    outs:
+    - path: aligned/coronal/Gad1
+      md5: 1d6c199da900857cd36f0edd2c281bcd.dir
+      size: 49907051
+      nfiles: 4
+    - path: aligned/sagittal/Gad1
+      md5: 3a7459686ad3506b04c6559b397fb69d.dir
+      size: 187555690
+      nfiles: 36
+  align@Mbp:
+    cmd: python align.py Mbp
+    deps:
+    - path: align.py
+      md5: d2beddabe97a2251069806c7e040610b
+      size: 4780
+    - path: coronal/Mbp
+      md5: 7a2eb075a8dbe085e94f9442422e42ed.dir
+      size: 25829111
+      nfiles: 2
+    - path: sagittal/Mbp
+      md5: 9a48c49e497496b59f7c3945b2aa73fe.dir
+      size: 9124355
+      nfiles: 2
+    outs:
+    - path: aligned/coronal/Mbp
+      md5: 385bcec5d5790c3035673e3bdc05f6b1.dir
+      size: 25829111
+      nfiles: 2
+    - path: aligned/sagittal/Mbp
+      md5: a8d309b271d53b02e26e21cd21742333.dir
+      size: 9124355
+      nfiles: 2
+  align@Tmem119:
+    cmd: python align.py Tmem119
+    deps:
+    - path: align.py
+      md5: d2beddabe97a2251069806c7e040610b
+      size: 4780
+    - path: coronal/Tmem119
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: sagittal/Tmem119
+      md5: 69c8537053b9451ccb49f7e347d216b9.dir
+      size: 8110531
+      nfiles: 2
+    outs:
+    - path: aligned/coronal/Tmem119
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: aligned/sagittal/Tmem119
+      md5: cec66ba71898a455f754b198bf168e34.dir
+      size: 8110531
+      nfiles: 2
+  align@Cnp:
+    cmd: python align.py Cnp
+    deps:
+    - path: align.py
+      md5: d2beddabe97a2251069806c7e040610b
+      size: 4780
+    - path: coronal/Cnp
+      md5: 158c1cf5e62d3f1de15c63307faa10cf.dir
+      size: 72671662
+      nfiles: 6
+    - path: sagittal/Cnp
+      md5: 47753887d05b9acfe5ed93ec6380ebbe.dir
+      size: 9631272
+      nfiles: 2
+    outs:
+    - path: aligned/coronal/Cnp
+      md5: ddb48f3abb82a21f983f29f824db5d24.dir
+      size: 72671662
+      nfiles: 6
+    - path: aligned/sagittal/Cnp
+      md5: 84812434043d7bd2c1a9593a1dc46b0a.dir
+      size: 9631272
+      nfiles: 2
+  align@Vip:
+    cmd: python align.py Vip
+    deps:
+    - path: align.py
+      md5: d2beddabe97a2251069806c7e040610b
+      size: 4780
+    - path: coronal/Vip
+      md5: 1ac09416ccb5d78343210eadd79d6b2a.dir
+      size: 23640166
+      nfiles: 2
+    - path: sagittal/Vip
+      md5: 1f340b0b2f1f15a7c6e8df3e8bc104f3.dir
+      size: 10645286
+      nfiles: 4
+    outs:
+    - path: aligned/coronal/Vip
+      md5: 0e29042d6c29bcc61dade94751ecb98a.dir
+      size: 23640166
+      nfiles: 2
+    - path: aligned/sagittal/Vip
+      md5: 74fea0d4ce2731ce73730609e9a544d7.dir
+      size: 10645286
+      nfiles: 4
+  align@Aldh1l1:
+    cmd: python align.py Aldh1l1
+    deps:
+    - path: align.py
+      md5: d2beddabe97a2251069806c7e040610b
+      size: 4780
+    - path: coronal/Aldh1l1
+      md5: ada7497bc3defeae1a8f77bdce47578e.dir
+      size: 24515772
+      nfiles: 2
+    - path: sagittal/Aldh1l1
+      md5: b623bf2274737ba9bc1fa59ede12394b.dir
+      size: 10138172
+      nfiles: 2
+    outs:
+    - path: aligned/coronal/Aldh1l1
+      md5: 9964b1297123936f2fade9106f2d9267.dir
+      size: 24515772
+      nfiles: 2
+    - path: aligned/sagittal/Aldh1l1
+      md5: c60795d27e6a221a4a412867874e6e83.dir
+      size: 10138172
+      nfiles: 2
+  align@Gfap:
+    cmd: python align.py Gfap
+    deps:
+    - path: align.py
+      md5: d2beddabe97a2251069806c7e040610b
+      size: 4780
+    - path: coronal/Gfap
+      md5: 46ca22af0a56aa84fea4c5eff02ebe9f.dir
+      size: 49469273
+      nfiles: 4
+    - path: sagittal/Gfap
+      md5: b81cf44d3d2eaaf6569e85d013456653.dir
+      size: 19769423
+      nfiles: 4
+    outs:
+    - path: aligned/coronal/Gfap
+      md5: 8a5ca5ee8afbc8add397d03cc56e81d1.dir
+      size: 49469273
+      nfiles: 4
+    - path: aligned/sagittal/Gfap
+      md5: e2f8a01571693784f33ced47ce73ae8d.dir
+      size: 19769423
+      nfiles: 4
+  align@S100b:
+    cmd: python align.py S100b
+    deps:
+    - path: align.py
+      md5: d2beddabe97a2251069806c7e040610b
+      size: 4780
+    - path: coronal/S100b
+      md5: 10c3243c600ce698292f34ac997561f3.dir
+      size: 48593721
+      nfiles: 4
+    - path: sagittal/S100b
+      md5: 0a63ca7f9dffed3eeb181f2975cca503.dir
+      size: 20276538
+      nfiles: 6
+    outs:
+    - path: aligned/coronal/S100b
+      md5: 203d9c64f06a26aaac91e000ced6fff4.dir
+      size: 48593721
+      nfiles: 4
+    - path: aligned/sagittal/S100b
+      md5: a6e7d13d630db3363c274924c494e75a.dir
+      size: 20276538
+      nfiles: 6
+  align@Pvalb:
+    cmd: python align.py Pvalb
+    deps:
+    - path: align.py
+      md5: d2beddabe97a2251069806c7e040610b
+      size: 4780
+    - path: coronal/Pvalb
+      md5: c92164ee9060ab05f7e22aa1653ce02c.dir
+      size: 49031493
+      nfiles: 4
+    - path: sagittal/Pvalb
+      md5: 80bc2f3251db358cac9993e81179a361.dir
+      size: 193132016
+      nfiles: 40
+    outs:
+    - path: aligned/coronal/Pvalb
+      md5: de9fb1bcd123378d1810910c77d66a37.dir
+      size: 49031493
+      nfiles: 4
+    - path: aligned/sagittal/Pvalb
+      md5: b4c1de9963ca371728090676dcb970fa.dir
+      size: 193132016
+      nfiles: 40
+  align_special_dataset@100142290:
+    cmd: python align_special_dataset.py 100142290
+    deps:
+    - path: align_special_dataset.py
+      md5: 4f0d67751380b4826b1a8e888a600b11
+      size: 3500
+    - path: special_volumes/dataset_100142290/
+      md5: 588c87d6ae94538b0482c070f6f2c0e2.dir
+      size: 2207522403
+      nfiles: 5
+    outs:
+    - path: aligned/special_volumes/dataset_100142290/
+      md5: 3cf00f6c9ad8121abcf719fd8a9b144d.dir
+      size: 1933148544
+      nfiles: 3
+  align_special_dataset@100142355:
+    cmd: python align_special_dataset.py 100142355
+    deps:
+    - path: align_special_dataset.py
+      md5: 4f0d67751380b4826b1a8e888a600b11
+      size: 3500
+    - path: special_volumes/dataset_100142355/
+      md5: be26a006196740fb012b183e43a637d0.dir
+      size: 2087285213
+      nfiles: 5
+    outs:
+    - path: aligned/special_volumes/dataset_100142355/
+      md5: 843dd1e6d5edacac6fd1239665b7468c.dir
+      size: 1807073664
+      nfiles: 3
+  align_special_dataset@100141805:
+    cmd: python align_special_dataset.py 100141805
+    deps:
+    - path: align_special_dataset.py
+      md5: 4f0d67751380b4826b1a8e888a600b11
+      size: 3500
+    - path: special_volumes/dataset_100141805/
+      md5: f7ec26648182bbf3b984699647373902.dir
+      size: 2227367315
+      nfiles: 5
+    outs:
+    - path: aligned/special_volumes/dataset_100141805/
+      md5: 633bbb62a183d7cf28fab4912aa9298d.dir
+      size: 1954161024
+      nfiles: 3

@@ -1,4 +1,8 @@
 stages:
+  download-nissl:
+    cmd: wget http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/ara_nissl/ara_nissl_25.nrrd
+    outs:
+      - ara_nissl_25.nrrd
   download_special_dataset:
     foreach:
       - 100142290
@@ -30,3 +34,37 @@ stages:
       outs:
         - coronal/${item}
         - sagittal/${item}
+  align:
+    foreach:
+      - Mbp
+      - S100b
+      - Gfap
+      - Cnp
+      - Pcnp
+      - Aldh1l1
+      - Tmem119
+      - Pvalb
+      - Sst
+      - Vip
+      - Gad1
+    do:
+      cmd: python align.py ${item}
+      deps:
+        - align.py
+        - coronal/${item}
+        - sagittal/${item}
+      outs:
+        - aligned/coronal/${item}
+        - aligned/sagittal/${item}
+  align_special_dataset:
+    foreach:
+      - 100142290
+      - 100142355
+      - 100141805
+    do:
+      cmd: python align_special_dataset.py ${item}
+      deps:
+        - align_special_dataset.py
+        - special_volumes/dataset_${item}/
+      outs:
+        - aligned/special_volumes/dataset_${item}/
