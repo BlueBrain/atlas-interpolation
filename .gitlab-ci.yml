@@ -28,5 +28,6 @@ pytest:
     - apt-get update && apt-get install -y python3-opencv
     - pip install --no-cache-dir $(grep 'torch==' requirements.txt)
     - pip install -r requirements.txt
-    - pip install ".[dev, optical]"
+    - pip install ".[optical]"
+    - pip install pytest pytest-cov
     - pytest
