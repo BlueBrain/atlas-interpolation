@@ -50,8 +50,8 @@ class OpticalFlow(ABC):
             The optical flow of shape (*image.shape, 2).
         """
 
-    @staticmethod
-    def warp_image(flow, img2, order=1):
+    @classmethod
+    def warp_image(cls, flow, img2, order=1):
         """Warp image with the predicted flow.
 
         Parameters
@@ -68,12 +68,25 @@ class OpticalFlow(ABC):
         warped_image : np.ndarray
             The warped image.
         """
-        if len(img2.shape) != 2:
-            raise ValueError(f"img must have shape (ni, nj), but got {img2.shape}")
-        ni, nj = img2.shape
-        ij = np.mgrid[:ni, :nj]
-        warped_image = ndimage.map_coordinates(img2, ij - flow, order=order)
-        return warped_image
+        if img2.ndim == 2:
+            # greyscale
+            ni, nj = img2.shape
+            ij = np.mgrid[:ni, :nj]
+            warped = ndimage.map_coordinates(img2, ij - flow, order=order)
+        elif img2.ndim == 3 and img2.shape[-1] == 3:
+            # RGB, warp each channel separately
+            warped = np.stack(
+                [
+                    cls.warp_image(flow, img2[..., 0], order=order),
+                    cls.warp_image(flow, img2[..., 1], order=order),
+                    cls.warp_image(flow, img2[..., 2], order=order),
+                ],
+                axis=-1,
+            )
+        else:
+            raise ValueError(f"Invalid image shape: {img2.shape}")
+
+        return warped
 
 
 class MaskFlowNet(OpticalFlow):
@@ -238,6 +251,9 @@ class RAFTNet(OpticalFlow):
         if len(img1.shape) == 2:
             img1 = np.repeat(img1[np.newaxis], 3, axis=0)
             img2 = np.repeat(img2[np.newaxis], 3, axis=0)
+        else:
+            img1 = np.transpose(img1, (2, 0, 1))
+            img2 = np.transpose(img2, (2, 0, 1))
 
         img1 = img1[np.newaxis]
         img2 = img2[np.newaxis]

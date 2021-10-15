@@ -47,9 +47,9 @@ def test_pair_interpolation_model():
         (10, 1023),
     ),
 )
-def test_pair_interpolate(n_repeat, n_expected_interpolations):
+@pytest.mark.parametrize("shape", [(10, 10), (10, 10, 3)])
+def test_pair_interpolate(n_repeat, n_expected_interpolations, shape):
     # Test input
-    shape = (10, 10)
     img1 = np.random.rand(*shape)
     img2 = np.random.rand(*shape)
 
@@ -66,7 +66,7 @@ def test_pair_interpolate(n_repeat, n_expected_interpolations):
 
     # Check results
     assert isinstance(interpolated, np.ndarray)
-    assert len(interpolated.shape) == 3
+    assert len(interpolated.shape) == len(shape) + 1
     assert interpolated.shape[1:] == img1.shape
     assert len(interpolated) == n_expected_interpolations
     model.before_interpolation.assert_called_once()
@@ -74,9 +74,9 @@ def test_pair_interpolate(n_repeat, n_expected_interpolations):
     model.after_interpolation.assert_called_once()
 
 
-def test_linear_pair_interpolation_model():
+@pytest.mark.parametrize("shape", [(10, 10), (10, 10, 3)])
+def test_linear_pair_interpolation_model(shape):
     # Test input
-    shape = (10, 10)
     img1 = np.random.rand(*shape)
     img2 = np.random.rand(*shape)
 
@@ -90,9 +90,9 @@ def test_linear_pair_interpolation_model():
     assert np.allclose(interpolated[0], np.mean([img1, img2], axis=0))
 
 
-def test_ants_pair_interpolation_model():
+@pytest.mark.parametrize("shape", [(10, 10), (10, 10, 3)])
+def test_ants_pair_interpolation_model(shape):
     # Test input
-    shape = (10, 10)
     img1 = np.random.rand(*shape)
     img2 = np.random.rand(*shape)
     img_mid = np.random.rand(*shape)
@@ -110,12 +110,12 @@ def test_ants_pair_interpolation_model():
     transform_fn.assert_called_once()
 
 
-def test_cain_pair_interpolation_model():
+@pytest.mark.parametrize("shape", [(10, 10), (10, 10, 3)])
+def test_cain_pair_interpolation_model(shape):
     # Test input
-    shape = (10, 10)
     img1 = np.random.rand(*shape)
     img2 = np.random.rand(*shape)
-    img_mid = torch.rand(1, 3, *shape)
+    img_mid = torch.rand(1, 3, *shape[0:2])
 
     # Test instances
     cain_model = mock.Mock(return_value=(img_mid, None))
@@ -128,12 +128,12 @@ def test_cain_pair_interpolation_model():
     cain_model.assert_called_once()
 
 
-def test_rife_pair_interpolation_model():
+@pytest.mark.parametrize("shape", [(10, 10), (10, 10, 3)])
+def test_rife_pair_interpolation_model(shape):
     # Test input
-    shape = (10, 10)
     img1 = np.random.rand(*shape)
     img2 = np.random.rand(*shape)
-    img_mid = torch.rand(1, 3, *shape)
+    img_mid = torch.rand(1, 3, *shape[0:2])
 
     # Test instances
     rife_model = mock.Mock()
@@ -154,15 +154,16 @@ class FakeModel(PairInterpolationModel):
         return img_middle
 
 
-def fake_gene_data(axis, shape):
+def fake_gene_data(axis, slice_shape, volume_shape):
     n_known_slices = 3
-    gene_volume = np.ones((n_known_slices, *shape, 3))
+    gene_volume = np.ones((n_known_slices, *slice_shape))
+
     for i in range(n_known_slices):
         gene_volume[i] = (i + 1) * gene_volume[i]
 
     section_numbers = [10 + i * 8 for i in range(n_known_slices)]
 
-    return GeneDataset(gene_volume, section_numbers, axis, (30, 20, 40, 3))
+    return GeneDataset(gene_volume, section_numbers, axis, volume_shape)
 
 
 class TestGeneInterpolate:
@@ -197,35 +198,37 @@ class TestGeneInterpolate:
             "sagittal",
         ],
     )
-    def test_predict_slice(self, axis):
+    @pytest.mark.parametrize("volume_shape", [(30, 20, 40), (32, 18, 29)])
+    @pytest.mark.parametrize("rgb", [True, False])
+    def test_predict_slice(self, axis, volume_shape, rgb):
         """Check that one can predict one slice."""
         if axis == "coronal":
-            shape = (20, 40)
+            shape = (volume_shape[1], volume_shape[2])
         else:
-            shape = (30, 20)
+            shape = (volume_shape[0], volume_shape[1])
 
-        gene_data = fake_gene_data(axis, shape)
+        if rgb:
+            volume_shape = (*volume_shape, 3)
+            shape = (*shape, 3)
+
+        gene_data = fake_gene_data(axis, shape, volume_shape)
         gene_interpolate = GeneInterpolate(gene_data, FakeModel())
         prediction = gene_interpolate.predict_slice(5)
         assert isinstance(prediction, np.ndarray)
-        assert np.all(prediction.shape == (*shape, 3))
+        assert np.all(prediction.shape == shape)
 
         # Slice to predict is < first known gene slice, copy the first one
-        assert np.all(gene_interpolate.predict_slice(5) == np.ones((*shape, 3)) * 1)
+        assert np.all(gene_interpolate.predict_slice(5) == np.ones(shape) * 1)
         # Slice to predict is > last known gene slice, copy the last one
-        assert np.all(gene_interpolate.predict_slice(100) == np.ones((*shape, 3)) * 3)
+        assert np.all(gene_interpolate.predict_slice(100) == np.ones(shape) * 3)
         # Result of the first iteration
-        assert np.all(gene_interpolate.predict_slice(14) == np.ones((*shape, 3)) * 1.5)
+        assert np.all(gene_interpolate.predict_slice(14) == np.ones(shape) * 1.5)
         # Result of the second iteration
-        assert np.all(gene_interpolate.predict_slice(12) == np.ones((*shape, 3)) * 1.25)
-        assert np.all(gene_interpolate.predict_slice(16) == np.ones((*shape, 3)) * 1.75)
+        assert np.all(gene_interpolate.predict_slice(12) == np.ones(shape) * 1.25)
+        assert np.all(gene_interpolate.predict_slice(16) == np.ones(shape) * 1.75)
         # Result of the third iteration
-        assert np.all(
-            gene_interpolate.predict_slice(11) == np.ones((*shape, 3)) * 1.125
-        )
-        assert np.all(
-            gene_interpolate.predict_slice(17) == np.ones((*shape, 3)) * 1.875
-        )
+        assert np.all(gene_interpolate.predict_slice(11) == np.ones(shape) * 1.125)
+        assert np.all(gene_interpolate.predict_slice(17) == np.ones(shape) * 1.875)
 
     @pytest.mark.parametrize(
         "axis",
@@ -234,14 +237,20 @@ class TestGeneInterpolate:
             "sagittal",
         ],
     )
-    def test_get_all_predictions(self, axis):
+    @pytest.mark.parametrize("volume_shape", [(30, 20, 40), (32, 18, 29)])
+    @pytest.mark.parametrize("rgb", [True, False])
+    def test_get_all_predictions(self, axis, volume_shape, rgb):
         """Check that one can predict entire volume."""
         if axis == "coronal":
-            shape = (20, 40)
+            shape = (volume_shape[1], volume_shape[2])
         else:
-            shape = (30, 20)
+            shape = (volume_shape[0], volume_shape[1])
 
-        gene_data = fake_gene_data(axis, shape)
+        if rgb:
+            volume_shape = (*volume_shape, 3)
+            shape = (*shape, 3)
+
+        gene_data = fake_gene_data(axis, shape, volume_shape)
         gene_interpolate = GeneInterpolate(gene_data, FakeModel())
         (
             all_interpolated_images,
@@ -251,7 +260,7 @@ class TestGeneInterpolate:
         assert isinstance(all_predicted_section_numbers, np.ndarray)
         assert np.all(all_predicted_section_numbers.shape == (14,))
         # 14 = 2 intervals * 7 interpolated images per interval
-        assert np.all(all_interpolated_images.shape == (14, *shape, 3))
+        assert np.all(all_interpolated_images.shape == (14, *shape))
 
     @pytest.mark.parametrize(
         "axis",
@@ -260,24 +269,33 @@ class TestGeneInterpolate:
             "sagittal",
         ],
     )
-    def test_predict_volume(self, axis):
+    @pytest.mark.parametrize("volume_shape", [(30, 20, 40), (32, 18, 29)])
+    @pytest.mark.parametrize("rgb", [True, False])
+    def test_predict_volume(self, axis, volume_shape, rgb):
         """Check that one can predict entire volume."""
         if axis == "coronal":
-            shape = (20, 40)
+            shape = (volume_shape[1], volume_shape[2])
         else:
-            shape = (30, 20)
+            shape = (volume_shape[0], volume_shape[1])
 
-        gene_data = fake_gene_data(axis, shape)
+        if rgb:
+            volume_shape = (*volume_shape, 3)
+            shape = (*shape, 3)
+
+        gene_data = fake_gene_data(axis, shape, volume_shape)
         gene_interpolate = GeneInterpolate(gene_data, FakeModel())
         predicted_volume = gene_interpolate.predict_volume()
         assert isinstance(predicted_volume, np.ndarray)
-        assert np.all(predicted_volume.shape == (30, 20, 40, 3))
+        assert np.all(predicted_volume.shape == volume_shape)
 
         if axis == "sagittal":
-            predicted_volume = np.transpose(predicted_volume, (2, 0, 1, 3))
+            if rgb:
+                predicted_volume = np.transpose(predicted_volume, (2, 0, 1, 3))
+            else:
+                predicted_volume = np.transpose(predicted_volume, (2, 0, 1))
+
         assert np.all(np.unique(predicted_volume[0:10]) == np.array([1]))
-        # Check only 2 slices (could check [36:]), to avoid too long test
-        assert np.all(predicted_volume[36:38] == np.array([3]))
+        assert np.all(predicted_volume[36:] == np.array([3]))
 
     def test_predict_volume_wrong_axis(self):
 

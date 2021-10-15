@@ -13,12 +13,16 @@ class GeneDataset:
     ----------
     gene
         Array containing all gene slices known from a given dataset.
+        Dimensions should correspond to (n_genes, dim1, dim2)
+        for grayscale images and (n_genes, dim1, dim2, 3) for RGB.
     section_numbers
         List of the section numbers of the gene slices.
     axis
         Axis of the gene dataset.
     volume_shape
         Shape of the final volume.
+        Dimensions should correspond to (coronal, transverse, sagittal)
+        for grayscale images and (coronal, transverse, sagittal, 3) for RGB.
     """
 
     def __init__(
@@ -26,13 +30,15 @@ class GeneDataset:
         gene: np.ndarray,
         section_numbers: list[int],
         axis: str,
-        volume_shape: tuple[int, int, int, int] = (528, 320, 456, 3),
+        volume_shape: tuple[int, int, int]
+        | tuple[int, int, int, int] = (528, 320, 456, 3),
     ):
         """Instantiate gene dataset."""
-        if not isinstance(gene, np.ndarray) or gene.ndim != 4:
+        if not isinstance(gene, np.ndarray) or gene.ndim not in {3, 4}:
             raise ValueError(
-                "The gene has to be an array of 4 "
-                "dimensions (n_genes, dim1, dim2, 3)."
+                "The gene has to be an array of \n"
+                "* 3 dimensions (n_genes, dim1, dim2) for grayscale images. \n"
+                "* 4 dimensions (n_genes, dim1, dim2, 3) for RBG images."
             )
         self.gene = gene
         self.known_slices = section_numbers
@@ -48,7 +54,7 @@ class GeneDataset:
         if self.axis == "coronal":
             self.volume[slices] = self.gene
         elif self.axis == "sagittal":
-            self.volume[:, :, slices, :] = np.transpose(self.gene, (1, 2, 0, 3))
+            self.volume[:, :, slices] = np.moveaxis(self.gene, 0, 2)
 
         # Sorting known slices
         self.known_slices = sorted(self.known_slices)

@@ -14,12 +14,17 @@ class DummyModel(OpticalFlow):
         raise NotImplementedError
 
 
-def test_optical_flow_model():
+@pytest.mark.parametrize("rgb", [True, False])
+def test_optical_flow_model(rgb):
     """Test Optical Flow."""
-    shape = (10, 10)
+    if rgb:
+        shape = (10, 10, 3)
+    else:
+        shape = (10, 10)
+
     img1 = np.random.rand(*shape)
     img2 = np.random.rand(*shape)
-    flow = np.random.rand(2, *shape)
+    flow = np.random.rand(2, 10, 10)
 
     model = DummyModel()
 
@@ -30,9 +35,13 @@ def test_optical_flow_model():
     assert warped_img2.shape == shape
 
 
-def test_raftnet_model(monkeypatch):
+@pytest.mark.parametrize("rgb", [True, False])
+def test_raftnet_model(monkeypatch, rgb):
     """Test RAFT model."""
-    shape = (10, 10)
+    if rgb:
+        shape = (10, 10, 3)
+    else:
+        shape = (10, 10)
     img1 = np.random.rand(*shape)
     img2 = np.random.rand(*shape)
 
@@ -72,9 +81,13 @@ def test_raftnet_model(monkeypatch):
     assert new_img1.shape == shape
 
 
-def test_maskflownet_model(monkeypatch):
+@pytest.mark.parametrize("rgb", [True, False])
+def test_maskflownet_model(monkeypatch, rgb):
     """Test RAFT model."""
-    shape = (10, 10)
+    if rgb:
+        shape = (10, 10, 3)
+    else:
+        shape = (10, 10)
     img1 = np.random.rand(*shape)
     img2 = np.random.rand(*shape)
 

@@ -6,12 +6,19 @@ from atlinter.data import GeneDataset
 
 class TestGeneData:
     @pytest.mark.parametrize("axis", ["coronal", "sagittal"])
-    def test_gene_data(self, axis):
+    @pytest.mark.parametrize("rgb", [True, False])
+    def test_gene_data(self, axis, rgb):
         """Test GeneData class."""
-        volume_shape = (10, 20, 30, 3)
+        if rgb:
+            volume_shape = (10, 20, 30, 3)
+        else:
+            volume_shape = (10, 20, 30)
         end = volume_shape[0] if axis == "coronal" else volume_shape[2]
         gene_shape = (20, 30) if axis == "coronal" else (10, 20)
-        known_gene = np.random.rand(2, *gene_shape, 3)
+        if rgb:
+            known_gene = np.random.rand(2, *gene_shape, 3)
+        else:
+            known_gene = np.random.rand(2, *gene_shape)
         known_slices = [5, 8]  # random
 
         gene_data = GeneDataset(
@@ -30,8 +37,10 @@ class TestGeneData:
         assert len(gene_data.unknown_slices) == end - len(known_slices)
 
         # Check volume is well populated with known slices
-        if gene_data.axis == "sagittal":
+        if gene_data.axis == "sagittal" and rgb:
             volume = np.transpose(gene_data.volume, (2, 0, 1, 3))
+        elif gene_data.axis == "sagittal" and not rgb:
+            volume = np.transpose(gene_data.volume, (2, 0, 1))
         else:
             volume = gene_data.volume
         for i in range(end):
@@ -40,26 +49,37 @@ class TestGeneData:
             else:
                 assert volume[i].sum() == 0
 
-    def test_get_closest(self):
+    @pytest.mark.parametrize("rgb", [True, False])
+    def test_get_closest(self, rgb):
         """Test get closest known from GeneData."""
-        known_gene = np.random.rand(10, 20, 30, 3)
+        if rgb:
+            image_shape = (20, 30, 3)
+        else:
+            image_shape = (20, 30)
+
+        known_gene = np.random.rand(10, *image_shape)
         known_slices = np.arange(1, 11) * 10
         # known_slices = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         gene_data = GeneDataset(
-            known_gene, known_slices, "coronal", volume_shape=(110, 20, 30, 3)
+            known_gene, known_slices, "coronal", volume_shape=(110, *image_shape)
         )
         assert gene_data.get_closest_known(10) == 10
         assert gene_data.get_closest_known(110) == 100
         assert gene_data.get_closest_known(78) == 80
         assert gene_data.get_closest_known(55) == 50
 
-    def test_get_surroundings(self):
+    @pytest.mark.parametrize("rgb", [True, False])
+    def test_get_surroundings(self, rgb):
         """Test get surrounding gene slices."""
-        known_gene = np.random.rand(10, 20, 30, 3)
+        if rgb:
+            image_shape = (20, 30, 3)
+        else:
+            image_shape = (20, 30)
+        known_gene = np.random.rand(10, *image_shape)
         known_slices = np.arange(1, 11) * 10
         # known_slices = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         gene_data = GeneDataset(
-            known_gene, known_slices, "coronal", volume_shape=(110, 20, 30, 3)
+            known_gene, known_slices, "coronal", volume_shape=(110, *image_shape)
         )
         assert gene_data.get_surrounding_slices(2) == (None, 10)
         assert gene_data.get_surrounding_slices(10) == (10, 20)

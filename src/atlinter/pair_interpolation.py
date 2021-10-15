@@ -166,15 +166,31 @@ class RIFEPairInterpolationModel(PairInterpolationModel):
         img2 : np.ndarray
             The padded right image.
         """
-        self.shape = np.array(img1.shape)
+        image_shape = img1.shape
+        if len(image_shape) == 3 and image_shape[-1] == 3:
+            rgb = True
+            image_shape = image_shape[:-1]
+        else:
+            rgb = False
+
+        self.shape = np.array(image_shape)
         pad_x, pad_y = ((self.shape - 1) // 32 + 1) * 32 - self.shape
-        img1 = np.pad(img1, ((0, pad_x), (0, pad_y)))
-        img2 = np.pad(img2, ((0, pad_x), (0, pad_y)))
+
+        if rgb:
+            img1 = np.pad(img1, ((0, pad_x), (0, pad_y), (0, 0)))
+            img2 = np.pad(img2, ((0, pad_x), (0, pad_y), (0, 0)))
+        else:
+            img1 = np.pad(img1, ((0, pad_x), (0, pad_y)))
+            img2 = np.pad(img2, ((0, pad_x), (0, pad_y)))
 
         return img1, img2
 
     def interpolate(self, img1, img2):
         """Interpolate two images using RIFE.
+
+        Note: img1 and img2 needs to have the same shape.
+        If img1, img2 are grayscale, the dimension should be (height, width).
+        If img1, img2 are RGB image, the dimension should be (height, width, 3).
 
         Parameters
         ----------
@@ -188,23 +204,36 @@ class RIFEPairInterpolationModel(PairInterpolationModel):
         img_mid : np.ndarray
             The interpolated image.
         """
-        # Add batch and RGB dimensions, set device
-        img1 = (
-            torch.tensor(img1, dtype=torch.float32)
-            .repeat((1, 3, 1, 1))
-            .to(self.rife_device)
-        )
-        img2 = (
-            torch.tensor(img2, dtype=torch.float32)
-            .repeat((1, 3, 1, 1))
-            .to(self.rife_device)
-        )
+        # Add batch and RGB dimensions (if not already), set device
+        if len(img1.shape) == 2:
+            rgb = False
+            img1 = (
+                torch.tensor(img1, dtype=torch.float32)
+                .repeat((1, 3, 1, 1))
+                .to(self.rife_device)
+            )
+            img2 = (
+                torch.tensor(img2, dtype=torch.float32)
+                .repeat((1, 3, 1, 1))
+                .to(self.rife_device)
+            )
+        else:
+            rgb = True
+            img1 = np.transpose(img1, (2, 0, 1))[np.newaxis]
+            img2 = np.transpose(img2, (2, 0, 1))[np.newaxis]
+            img1 = torch.tensor(img1, dtype=torch.float32).to(self.rife_device)
+            img2 = torch.tensor(img2, dtype=torch.float32).to(self.rife_device)
 
         # The actual interpolation
         img_mid = self.rife_model.inference(img1, img2).detach().cpu().numpy()
 
-        # Average out the RGB dimension
-        img_mid = img_mid.squeeze().mean(axis=0)
+        img_mid = img_mid.squeeze()
+        if rgb:
+            # Put the RGB channel at the end
+            img_mid = np.transpose(img_mid, (1, 2, 0))
+        else:
+            # Average out the RGB dimension
+            img_mid = img_mid.mean(axis=0)
 
         return img_mid
 
@@ -215,6 +244,10 @@ class RIFEPairInterpolationModel(PairInterpolationModel):
         ----------
         interpolated_images : np.ndarray
             The stacked interpolated images.
+            If input images are grayscale,
+            the dimension should be (n_img, height, width).
+            If input images are RGB image,
+            the dimension should be (n_img, height, width, 3).
 
         Returns
         -------
@@ -248,6 +281,10 @@ class CAINPairInterpolationModel(PairInterpolationModel):
     def interpolate(self, img1, img2):
         """Interpolate two images using CAIN.
 
+        Note: img1 and img2 needs to have the same shape.
+        If img1, img2 are grayscale, the dimension should be (height, width).
+        If img1, img2 are RGB image, the dimension should be (height, width, 3).
+
         Parameters
         ----------
         img1 : np.ndarray
@@ -261,15 +298,26 @@ class CAINPairInterpolationModel(PairInterpolationModel):
             The interpolated image.
         """
         # Add batch and RGB dimensions
-        img1 = self.to_tensor(img1).repeat((1, 3, 1, 1))
-        img2 = self.to_tensor(img2).repeat((1, 3, 1, 1))
+        if len(img1.shape) == 2:
+            rgb = False
+            img1 = self.to_tensor(img1).repeat((1, 3, 1, 1))
+            img2 = self.to_tensor(img2).repeat((1, 3, 1, 1))
+        else:
+            rgb = True
+            img1 = self.to_tensor(np.transpose(img1, (2, 0, 1)))[None]
+            img2 = self.to_tensor(np.transpose(img2, (2, 0, 1)))[None]
 
         # The actual interpolation
         img_mid, _ = self.cain_model(img1, img2)
         img_mid = img_mid.detach().cpu().numpy()
 
-        # Average out the RGB dimension
-        img_mid = img_mid.squeeze().mean(axis=0)
+        img_mid = img_mid.squeeze()
+        if rgb:
+            # Put the RGB channel at the end
+            img_mid = np.transpose(img_mid, (1, 2, 0))
+        else:
+            # Average out the RGB dimension
+            img_mid = img_mid.mean(axis=0)
 
         return img_mid
 
@@ -414,7 +462,7 @@ class GeneInterpolate:
         self.gene_volume = self.gene_data.volume.copy()
         # If sagittal axis, put the sagittal dimension first
         if self.axis == "sagittal":
-            self.gene_volume = np.transpose(self.gene_volume, (2, 0, 1, 3))
+            self.gene_volume = np.moveaxis(self.gene_volume, 2, 0)
 
     def get_interpolation(self, left: int, right: int) -> tuple[np.ndarray, np.ndarray]:
         """Compute the interpolation for a pair of images.
@@ -517,8 +565,7 @@ class GeneInterpolate:
         volume = np.zeros(volume_shape)
 
         if self.gene_data.axis == "sagittal":
-            volume = np.transpose(volume, (2, 0, 1, 3))
-
+            volume = np.moveaxis(volume, 2, 0)
         # Get all the predictions
         (
             all_interpolated_images,
@@ -549,7 +596,7 @@ class GeneInterpolate:
                 volume[slice_number] = all_interpolated_images[index]
 
         if self.gene_data.axis == "sagittal":
-            volume = np.transpose(volume, (1, 2, 0, 3))
+            volume = np.moveaxis(volume, 0, 2)
 
         return volume
 
