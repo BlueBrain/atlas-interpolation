@@ -538,7 +538,7 @@ class GeneInterpolate:
 
         Returns
         -------
-        np.array
+        np.ndarray
             Predicted gene slice. Array of shape (dim1, dim2, 3)
             being (528, 320) for sagittal dataset and
             (320, 456) for coronal dataset.

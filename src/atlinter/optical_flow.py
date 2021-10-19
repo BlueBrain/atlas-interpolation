@@ -8,6 +8,8 @@ import numpy as np
 import torch
 from scipy import ndimage
 
+from atlinter.data import GeneDataset
+
 logger = logging.getLogger(__name__)
 
 
@@ -65,9 +67,12 @@ class OpticalFlow(ABC):
 
         Returns
         -------
-        warped_image : np.ndarray
+        warped : np.ndarray
             The warped image.
         """
+        if flow.shape[1:3] != img2.shape[0:2]:
+            raise ValueError("The flow shape and the image shape should be consistent.")
+
         if img2.ndim == 2:
             # greyscale
             ni, nj = img2.shape
@@ -283,3 +288,129 @@ class RAFTNet(OpticalFlow):
             flow_up = flow_up.cpu()
         flow = flow_up.detach().numpy()[0]
         return flow
+
+
+class GeneOpticalFlow:
+    """Computation of optical flow for gene dataset.
+
+    Parameters
+    ----------
+    gene_data
+        Gene Dataset. It contains a `volume` of reference shape
+        with all known slices located at the right place and a `metadata` dictionary
+        containing information about the axis of the dataset and the section numbers.
+    reference_volume
+        Reference volume used to compute optical flow. It needs to be of same shape
+        as gene_data.volume.
+    model
+        Model computing flow between two images.
+    """
+
+    def __init__(
+        self, gene_data: GeneDataset, reference_volume: np.ndarray, model: OpticalFlow
+    ):
+        self.gene_data = gene_data
+        self.reference_volume = reference_volume
+        self.model = model
+
+        self.axis = self.gene_data.axis
+
+        if self.axis == "coronal":
+            self.gene_volume = self.gene_data.volume.copy()
+            self.reference_volume = reference_volume
+        elif self.axis == "sagittal":
+            self.gene_volume = np.moveaxis(self.gene_data.volume, 2, 0)
+            self.reference_volume = np.moveaxis(reference_volume, 2, 0)
+        else:
+            raise ValueError(f"Unknown axis: {self.axis}")
+
+        # Use to save all flow predictions
+        self.pairwise_ref_flows = {}
+
+    def predict_ref_flow(self, idx_from: int, idx_to: int) -> np.ndarray:
+        """Compute optical flow between two given slices of the reference volume.
+
+        Parameters
+        ----------
+        idx_from
+            First section to consider
+        idx_to
+            Second section to consider.
+
+        Returns
+        -------
+        flow : np.ndarray
+            Predicted flow between the two given sections of the reference volume.
+
+        Raises
+        ------
+        ValueError
+            If one of the two slice_numbers is out of the boundaries
+            of the reference space.
+        """
+        n_slices = len(self.gene_volume)
+        if not (0 <= idx_from < n_slices and 0 <= idx_to < n_slices):
+            raise ValueError(
+                f"Slices ({idx_from} and {idx_to})"
+                f"have to be between 0 and {n_slices}"
+            )
+
+        if (idx_from, idx_to) in self.pairwise_ref_flows:
+            return self.pairwise_ref_flows[(idx_from, idx_to)]
+
+        preimg1, preimg2 = self.model.preprocess_images(
+            self.reference_volume[idx_from], self.reference_volume[idx_to]
+        )
+        flow = self.model.predict_flow(preimg1, preimg2)
+        self.pairwise_ref_flows[(idx_from, idx_to)] = flow
+        return flow
+
+    def predict_slice(self, slice_number: int) -> np.ndarray:
+        """Predict one gene slice.
+
+        Parameters
+        ----------
+        slice_number
+            Slice section to predict.
+
+        Returns
+        -------
+        np.ndarray
+            Predicted gene slice. Array of shape (dim1, dim2, 3)
+            being (528, 320) for sagittal dataset and
+            (320, 456) for coronal dataset.
+        """
+        closest = self.gene_data.get_closest_known(slice_number)
+        flow = self.predict_ref_flow(slice_number, closest)
+
+        closest_slice = self.gene_volume[closest]
+        predicted_slice = self.model.warp_image(flow, closest_slice)
+
+        return predicted_slice
+
+    def predict_volume(self) -> np.ndarray:
+        """Predict entire volume with known gene slices.
+
+        This function might be slow.
+
+        Returns
+        -------
+        np.ndarray
+            Entire gene volume. Array of shape of the volume GeneDataset.
+        """
+        volume_shape = self.gene_volume.shape
+        volume = np.zeros(volume_shape)
+
+        # Populate the volume
+        for slice_number in range(volume.shape[0]):
+            # If the slice is known, just copy the gene.
+            if slice_number in self.gene_data.known_slices:
+                volume[slice_number] = self.gene_volume[slice_number]
+            # If the slice is unknown, predict it
+            else:
+                volume[slice_number] = self.predict_slice(slice_number)
+
+        if self.gene_data.axis == "sagittal":
+            volume = np.moveaxis(volume, 0, 2)
+
+        return volume
