@@ -27,7 +27,7 @@ following GitHub's guidelines.
 
 ## Development Conventions
 
-`atlannot` uses:
+`atlinter` uses:
 - Black for formatting code
 - Flake8 for linting code
 - PyDocStyle for checking docstrings
