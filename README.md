@@ -52,6 +52,8 @@ rife_model.eval()
 rife_interpolation_model = RIFEPairInterpolationModel(rife_model, rife_device)
 
 # Predict middle image between img1 and img2
+img1 = ...
+img2 = ...
 img1, img2 = rife_interpolation_model.before_interpolation(img1=img1, img2=img2)
 img_middle = rife_interpolation_model.interpolate(img1=img1, img2=img2)
 img_middle =rife_interpolation_model.after_interpolation(img_middle)
@@ -69,6 +71,9 @@ checkpoint_path = "data/checkpoints/maskflownet.params"
 net = MaskFlowNet(checkpoint_path)
 
 # Predict flow between img1 and img2
+img1 = ...
+img2 = ...
+img3 = ...
 img1, img2 = net.preprocess_images(img1=img1, img2=img2)
 predicted_flow = net.predict_flow(img1=img1, img2=img2)
 
