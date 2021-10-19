@@ -14,6 +14,9 @@
 """The setup script."""
 from setuptools import find_packages, setup
 
+with open("README.md", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 install_requires = [
     "mxnet",
     "numpy",
@@ -54,11 +57,26 @@ extras_require = {
 
 setup(
     name="atlinter",
+    author="Blue Brain Project, EPFL",
     use_scm_version={
         "write_to": "src/atlinter/version.py",
         "write_to_template": '"""The package version."""\n__version__ = "{version}"\n',
         "local_scheme": "no-local-version",
     },
+    description="Interpolate missing section images in gene expression volumes",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/BlueBrain/atlas-interpolation",
+    project_urls={
+        "Source Code": "https://github.com/BlueBrain/atlas-interpolation",
+        "Bug Tracker": "https://github.com/BlueBrain/atlas-interpolation/issues",
+    },
+    classifiers=[
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: Unix",
+        "Operating System :: MacOS",
+        "Programming Language :: Python :: 3.7",
+    ],
     package_dir={"": "src"},
     packages=find_packages("src"),
     python_requires="~=3.7.0",
