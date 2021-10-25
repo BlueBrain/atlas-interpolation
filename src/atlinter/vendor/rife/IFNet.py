@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Source: https://github.com/hzwer/arXiv2020-RIFE/tree/6ff174584737a9aa27cd9654443a8a79c76799c9
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
