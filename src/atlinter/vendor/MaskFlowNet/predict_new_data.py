@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Source: https://github.com/microsoft/MaskFlownet/tree/5cba12772e2201f0d1c1e27161d224e585334571
 import os
 import sys
 
