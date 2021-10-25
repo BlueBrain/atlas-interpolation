@@ -44,6 +44,7 @@ extras_require = {
         "flake8-comprehensions",
         "flake8-docstrings",
         "isort",
+        "py-vendor==0.1.2",
         "pytest",
         "pytest-cov",
         "tox",

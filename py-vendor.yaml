@@ -1,0 +1,50 @@
+params:
+  vendor_dir: src/atlinter/vendor
+vendors:
+  rife:
+    url: https://github.com/hzwer/arXiv2020-RIFE.git
+    ref: 6ff174584737a9aa27cd9654443a8a79c76799c9
+    copy:
+      - pattern: model/*.py
+        relative_to: model
+        subs:
+          - ["from model", "from "]
+    create:
+      - __init__.py
+  cain:
+    url: https://github.com/myungsub/CAIN.git
+    ref: fff8fc321c5a76904ed2a12c9500e055d4c77256
+    copy:
+      - pattern: model/*.py
+        relative_to: model
+        subs:
+          - ["from model", "from "]
+    create:
+      - __init__.py
+  MaskFlowNet:
+    url: https://github.com/microsoft/MaskFlownet.git
+    ref: 5cba12772e2201f0d1c1e27161d224e585334571
+    copy:
+      - pattern: predict_new_data.py
+        subs:
+          - ["^import path", "from . import path"]
+          - ["^import logger", "from . import logger"]
+          - ["^from network", "from .network"]
+          - ["^import network.config", "from .network import config"]
+          - ["network.config", "config"]
+      - path.py
+      - logger.py
+      - network/**/*.py
+    create:
+      - __init__.py
+  RAFT:
+    url: https://github.com/princeton-vl/RAFT.git
+    ref: 224320502d66c356d88e6c712f38129e60661e80
+    copy:
+      - pattern: core/**/*.py
+        relative_to: core
+        subs:
+          - ["^from update", "from .update"]
+          - ["^from extractor", "from .extractor"]
+          - ["^from corr", "from .corr"]
+          - ["^from utils", "from .utils"]
