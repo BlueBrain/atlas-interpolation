@@ -142,9 +142,18 @@ where `<filename>` should be replaced by one of the filenames found in the `data
 See the `data/README.md` file for the description of different data files.
 
 ## Vendors
-Some dependencies are not available as packages and therefore had to be vendored.
+Some dependencies are not available as packages and therefore had to be
+vendored. The vendoring is done using the
+[`py-vendor`](https://pypi.org/project/py-vendor/) utility. It's installed
+automatically together with the `dev` extras. You can also install it by hand
+via `pip install py-vendor==0.1.2`.
 
-See the `get_vendors.sh` script for the details on vendored data.
+The vendoring is then done using the following command (add `--force` to
+overwrite existing folders):
+```shell
+py-vendor run --config py-vendor.yaml
+```
+See the `py-vendor.yaml` file for details on the vendor sources and files.
 
 ## Funding & Acknowledgment
 
