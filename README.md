@@ -62,8 +62,8 @@ img_middle =rife_interpolation_model.after_interpolation(img_middle)
 interpolated_imgs = PairInterpolate(n_repeat=3)(img1, img2, rife_interpolation_model)
 ``` 
 
-- One can predict optical flow between any pair of images and use it to create. Please make sure
-that `optical` extra dependencies are installed.
+- One can predict optical flow between any pair of images and use it to create a new image. 
+Please make sure that `optical` extra dependencies are installed.
 ```shell
 pip install git+https://github.com/BlueBrain/atlas-interpolation#egg=atlinter[optical]
 ```
