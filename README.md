@@ -11,6 +11,10 @@ the missing slices and thus reconstruct whole gene expression volumes.
 * [Installation](#installation)
     * [Installation from source](#installation-from-source)
     * [Installation for development](#installation-for-development)
+* [Data](#data)
+    * [Downloading data from scratch](#downloading-data-from-scratch) 
+    * [Pulling from the remote](#pulling-from-the-remote)
+    * [Downloading new ISH datasets](#downloading-new-ish-datasets)
 * [Examples](#examples)
 * [Vendors](#vendors)
 * [Funding & Acknowledgment](#funding--acknowledgment)
@@ -32,6 +36,77 @@ source with all the extra requirements for running test.
 git clone https://github.com/BlueBrain/atlas-interpolation
 cd atlas-interpolation
 pip install -e '.[data, dev, optical]'
+```
+
+## Data
+
+The data for this project is managed using the DVC tool. There are two options to
+get the data:
+- Download them from scratch
+- Pull the pre-downloaded data from a remote machine (on the BBP intranet)
+
+In either case, one needs to clone the repository and install the extra `data` dependencies.
+```shell
+git clone https://github.com/BlueBrain/atlas-interpolation
+cd atlas-interpolation/data
+pip install git+https://github.com/BlueBrain/atlas-interpolation#egg=atlinter[data]
+```
+
+### Downloading data from scratch
+Downloading data from scratch can be done easily using dvc command.
+```shell
+dvc repro
+```
+This step might take some time.
+
+In some cases you might not need all data. Then it is possible to download unprepared
+data that you need by running specific DVC stages. 
+```shell
+dvc repro download-nissl # To download nissl volume
+dvc repro download_dataset # To download all listed genes in the dvc.yaml
+dvc repro download_dataset@Vip # To download specific gene expressions datasets, in this case Vip
+dvc repro download_special_dataset # To download all special datasets
+```
+
+If one wants those volumes already aligned to the Nissl Brain Atlas, one can directly 
+launch one of the following commands:
+```shell
+dvc repro align
+dvc repro align@Vip
+dvc repro align_special_dataset
+```
+This will take some time, especially if the volumes are not already downloaded. 
+
+### Pulling from the remote
+This only works if you have access to `proj101` on BBP intranet. Otherwise, follow
+the previous section [Downloading data from scratch](#downloading-data-from-scratch)
+instructions.
+
+If you are working on the BB5 please run the following commands
+first:
+```shell
+dvc remote add --local gpfs_proj101 \
+/gpfs/bbp.cscs.ch/data/project/proj101/dvc_remotes/atlas_interpolation
+```
+
+To pull all original data from the remote run
+```shell
+dvc pull
+```
+
+It is also possible to selectively pull data with
+```shell
+dvc pull <filename>.dvc
+```
+where `<filename>` should be replaced by one of the filenames found in the `data` directory.
+
+### Downloading new ISH datasets
+If one is interested into downloading ISH gene expressions that are not already 
+part of our DVC pipeline (cf. list in [`data/dvc.yaml`](data/dvc.yaml)), one can
+directly add the name of the gene of interest in the `foreach` list and launch:
+```shell
+dvc repro download_dataset@NEW_GENE
+dvc repro align@NEW_GENE
 ```
 
 ## Examples
@@ -86,7 +161,10 @@ predicted_flow = net.predict_flow(img1=img1, img2=img2)
 predicted_img = net.warp_image(predicted_flow, img3)
 ``` 
 
-- One can predict a given slice or an entire gene volume:
+- One can predict a given slice or an entire gene volume. 
+Please make sure to have the dataset `Vip` locally before running the code snippet.
+If it is not the case, please download it by following the [Data](#data) section instructions.
+
 ```python
 import json
 
@@ -126,25 +204,6 @@ gene_interpolate = GeneInterpolate(gene_dataset, rife_interpolation_model)
 predicted_slice = gene_interpolate.predict_slice(10)
 predicted_volume = gene_interpolate.predict_volume()
 ```
-
-## Data
-
-The data for this project is managed using the DVC tool.
-
-All data is stored in the `data` directory. DVC is similar to git. To pull all original
-data from the remote run
-```shell
-cd data
-dvc pull
-```
-
-It is also possible to selectively pull data with
-```shell
-cd data
-dvc pull <filename>.dvc
-```
-where `<filename>` should be replaced by one of the filenames found in the `data` directory.
-See the `data/README.md` file for the description of different data files.
 
 ## Vendors
 Some dependencies are not available as packages and therefore had to be
