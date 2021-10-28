@@ -134,13 +134,20 @@ one needs first to download/pull the specific checkpoints of the model
 ```shell
 cd data
 
-dvc pull checkpoints/rife.dvc # RIFE model
-dvc pull checkpoints/cain.dvc # CAIN model
+dvc pull checkpoints/rife.dvc  # RIFE model
+#dvc pull checkpoints/cain.dvc # CAIN model
 ```
+
+If you are not able to pull:
+- For RIFE: please follow instructions from https://github.com/hzwer/arXiv2020-RIFE#cli-usage
+to download the model
+- For CAIN: please follow instructions from https://github.com/myungsub/CAIN#usage 
+to download the model
 
 #### Example Code
 
-To make it run correctly, please be at the root folder of the project.
+Please be at the root folder of the project or change the `checkpoint_path`
+to run the example code below properly.
 
 ```python
 import numpy as np
@@ -150,21 +157,20 @@ from atlinter.vendor.rife.RIFE_HD import device as rife_device
 from atlinter.pair_interpolation import PairInterpolate, RIFEPairInterpolationModel
 
 # Instantiate the Pair Interpolation model (in this case: RIFE)
+checkpoint_path = "data/checkpoints/rife/" # Please change, if needed
 rife_model = RifeModel()
-rife_model.load_model("data/checkpoints/rife/", -1)
+rife_model.load_model(checkpoint_path, -1)
 rife_model.eval()
 rife_interpolation_model = RIFEPairInterpolationModel(rife_model, rife_device)
 
 # Predict middle image between img1 and img2
 img1 = np.random.rand(100, 200, 3) # replace by real section image
 img2 = np.random.rand(100, 200, 3) # replace by real section image
-img1, img2 = rife_interpolation_model.before_interpolation(img1=img1, img2=img2)
-img_middle = rife_interpolation_model.interpolate(img1=img1, img2=img2)
+preimg1, preimg2 = rife_interpolation_model.before_interpolation(img1=img1, img2=img2)
+img_middle = rife_interpolation_model.interpolate(img1=preimg1, img2=preimg2)
 img_middle = rife_interpolation_model.after_interpolation(img_middle)
 
 # If you want to predict several images between img1 and img2
-img1 = np.random.rand(100, 200, 3) # replace by real section image
-img2 = np.random.rand(100, 200, 3) # replace by real section image
 interpolated_imgs = PairInterpolate(n_repeat=3)(img1, img2, rife_interpolation_model)
 ``` 
 
@@ -182,17 +188,28 @@ One also needs to download/pull the specific checkpoints of the model:
 ```shell
 cd data
 
-dvc pull checkpoints/RAFT.dvc               # RAFT model
 dvc pull checkpoints/maskflownet.params.dvc # MaskFlowNet model
+#dvc pull checkpoints/RAFT.dvc              # RAFT model
 ```
+
+If you are not able to pull:
+- For MaskFlowNet: please go to https://github.com/microsoft/MaskFlownet/tree/master/weights
+and download `8caNov12-1532_300000.params` file.
+- For RAFT: please follow the instructions from https://github.com/princeton-vl/RAFT#demos
+to download the model.
 
 #### Example Code
 
+Please be at the root folder of the project or change the `checkpoint_path`
+to run the example code below properly.
+
 ```python
+import numpy as np
+
 from atlinter.optical_flow import MaskFlowNet
 
 # Instantiate the Optical Flow model (in this case: MaskFlowNet)
-checkpoint_path = "data/checkpoints/maskflownet.params"
+checkpoint_path = "data/checkpoints/maskflownet.params" # Please change, if needed
 net = MaskFlowNet(checkpoint_path)
 
 # Predict flow between img1 and img2
@@ -211,9 +228,19 @@ predicted_img = net.warp_image(predicted_flow, img3)
 #### Setup
 
 Please make sure to have the dataset `Vip` locally before running the code snippet.
-If it is not the case, please download it by following the [Data](#data) section instructions.
+If it is not the case, please download it:
+```shell
+cd data
+
+dvc pull download_dataset@Vip
+```
+If you do not have access to `proj101`, please replace `dvc pull` by `dvc repro`.
+This might take some time.
 
 #### Example Code
+
+Please be at the root folder of the project or change the different paths
+to run the example code below properly.
 
 ```python
 import json
@@ -221,17 +248,16 @@ import json
 import numpy as np
 
 from atlinter.data import GeneDataset
-from atlinter.pair_interpolation import (
-   GeneInterpolate,
-   RIFEPairInterpolationModel,
-)
+from atlinter.pair_interpolation import GeneInterpolate, RIFEPairInterpolationModel
 from atlinter.vendor.rife.RIFE_HD import Model as RifeModel
 from atlinter.vendor.rife.RIFE_HD import device as rife_device
 
 # 1.  Prepare dataset
 # 1.a Load gene and section numbers
-gene = np.load("data/sagittal/Vip/1102.npy")
-with open("data/sagittal/Vip/1102.json") as f:
+data_path = "data/sagittal/Vip/1102.npy"  # Change the path if needed
+data_json = "data/sagittal/Vip/1102.json" # Change the path if needed
+gene = np.load(data_path)
+with open(data_json) as f:
     metadata = json.load(f)
 section_numbers = [int(s) for s in metadata["section_numbers"]]
 
@@ -244,8 +270,9 @@ gene_dataset = GeneDataset(
 )
 
 # 2. Choose and instantiate the model (for example RIFE)
+checkpoint_path = "data/checkpoints/rife/"  # Change the path if needed
 rife_model = RifeModel()
-rife_model.load_model("data/checkpoints/rife/", -1)
+rife_model.load_model(checkpoint_path, -1)
 rife_model.eval()
 rife_interpolation_model = RIFEPairInterpolationModel(rife_model, rife_device)
 

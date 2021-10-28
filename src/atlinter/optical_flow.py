@@ -125,7 +125,7 @@ class MaskFlowNet(OpticalFlow):
 
     from atlinter.vendor.MaskFlowNet import network, predict_new_data
 
-    def __init__(self, checkpoint_path, gpu_device="0"):
+    def __init__(self, checkpoint_path, gpu_device=""):
         config_file = {
             "network": {"class": "MaskFlownet"},
             "optimizer": {
@@ -218,11 +218,11 @@ class RAFTNet(OpticalFlow):
 
     from atlinter.vendor.RAFT.raft import RAFT
 
-    def __init__(self, path, device="cuda"):
+    def __init__(self, path, device="cpu"):
         self.device = device
         args = self.initialize_namespace()
         self.model = torch.nn.DataParallel(self.RAFT(args))
-        self.model.load_state_dict(torch.load(path))
+        self.model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
         self.model = self.model.module
         if self.device == "cuda":
             self.model.to(self.device)
