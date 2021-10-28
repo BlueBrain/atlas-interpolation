@@ -222,7 +222,7 @@ class RAFTNet(OpticalFlow):
         self.device = device
         args = self.initialize_namespace()
         self.model = torch.nn.DataParallel(self.RAFT(args))
-        self.model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+        self.model.load_state_dict(torch.load(path, map_location=torch.device("cpu")))
         self.model = self.model.module
         if self.device == "cuda":
             self.model.to(self.device)

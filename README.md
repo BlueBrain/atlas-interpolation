@@ -240,7 +240,9 @@ This might take some time.
 #### Example Code
 
 Please be at the root folder of the project or change the different paths
-to run the example code below properly.
+to run the example code below properly. The code might take some time, especially
+the prediction of the entire volume (last line of the code), an environement
+with GPUs could speed up the runtime.
 
 ```python
 import json
@@ -279,7 +281,7 @@ rife_interpolation_model = RIFEPairInterpolationModel(rife_model, rife_device)
 # 3. Instantiate GeneInterpolate and predict specific slice or entire volume
 gene_interpolate = GeneInterpolate(gene_dataset, rife_interpolation_model)
 predicted_slice = gene_interpolate.predict_slice(10)
-predicted_volume = gene_interpolate.predict_volume()
+predicted_volume = gene_interpolate.predict_volume()  # This might take some time.
 ```
 
 ## Vendors
