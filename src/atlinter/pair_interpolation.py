@@ -258,16 +258,22 @@ class RIFEPairInterpolationModel(PairInterpolationModel):
         interpolated_images : np.ndarray
             The stacked interpolated images.
             If input images are grayscale,
-            the dimension should be (n_img, height, width).
+            the dimension should be (n_img, height, width) or (height, width).
             If input images are RGB image,
-            the dimension should be (n_img, height, width, 3).
+            the dimension should be (n_img, height, width, 3) or (height, width, 3).
 
         Returns
         -------
         np.ndarray
             The stacked interpolated images with padding removed.
         """
-        return interpolated_images[:, : self.shape[0], : self.shape[1]]
+        # No n_img dimension: (height, width) or (height, width, 3)
+        if len(interpolated_images.shape) == 2 or \
+                (len(interpolated_images.shape) == 3 and interpolated_images.shape[-1] == 3):
+            return interpolated_images[: self.shape[0], : self.shape[1]]
+        # n_img dimension: (n_img, height, width) or (n_img, height, width, 3)
+        else:
+            return interpolated_images[:, : self.shape[0], : self.shape[1]]
 
 
 class CAINPairInterpolationModel(PairInterpolationModel):

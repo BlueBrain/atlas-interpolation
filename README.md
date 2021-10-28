@@ -16,6 +16,9 @@ the missing slices and thus reconstruct whole gene expression volumes.
     * [Pulling from the remote](#pulling-from-the-remote)
     * [Downloading new ISH datasets](#downloading-new-ish-datasets)
 * [Examples](#examples)
+    * [Pair Interpolation Models](#pair-interpolation-models)
+    * [Optical Flow Models](#optical-flow-models)
+    * [Predict Entire Gene Volume](#predict-entire-gene-volume)
 * [Vendors](#vendors)
 * [Funding & Acknowledgment](#funding--acknowledgment)
 
@@ -51,6 +54,9 @@ git clone https://github.com/BlueBrain/atlas-interpolation
 cd atlas-interpolation/data
 pip install git+https://github.com/BlueBrain/atlas-interpolation#egg=atlinter[data]
 ```
+
+Pulling/Download the entire DVC is a huge amount of data (several GBs),
+do not hesitate to select only the data you are interested in.
 
 ### Downloading data from scratch
 Downloading data from scratch can be done easily using dvc command.
@@ -112,36 +118,75 @@ dvc repro align@NEW_GENE
 ## Examples
 
 Here are the different experiment one can do with `atlinter` package:
+- One can predict one/several images between a pair of images thanks to pair interpolation models
+- One can predict optical flow between any pair of images and use it to create a new image
+- One can predict a given slice or an entire gene volume.
 
-- One can predict one/several images between a pair of images thanks to pair interpolation models:
+Note that every models accept RGB images of shape `(height, width, 3)`
+and grayscale images of shape `(height, width)`.
+
+### Pair Interpolation Models
+
+#### Setup
+
+To use one of the pair interpolation models integrated in `atlinter` package,
+one needs first to download/pull the specific checkpoints of the model
+```shell
+cd data
+
+dvc pull checkpoints/rife.dvc # RIFE model
+dvc pull checkpoints/cain.dvc # CAIN model
+```
+
+#### Example Code
+
+To make it run correctly, please be at the root folder of the project.
 
 ```python
+import numpy as np
+
 from atlinter.vendor.rife.RIFE_HD import Model as RifeModel
 from atlinter.vendor.rife.RIFE_HD import device as rife_device
 from atlinter.pair_interpolation import PairInterpolate, RIFEPairInterpolationModel
 
 # Instantiate the Pair Interpolation model (in this case: RIFE)
 rife_model = RifeModel()
-rife_model.load_model("/path/to/train_log", -1)
+rife_model.load_model("data/checkpoints/rife/", -1)
 rife_model.eval()
 rife_interpolation_model = RIFEPairInterpolationModel(rife_model, rife_device)
 
 # Predict middle image between img1 and img2
-img1 = ...
-img2 = ...
+img1 = np.random.rand(100, 200, 3) # replace by real section image
+img2 = np.random.rand(100, 200, 3) # replace by real section image
 img1, img2 = rife_interpolation_model.before_interpolation(img1=img1, img2=img2)
 img_middle = rife_interpolation_model.interpolate(img1=img1, img2=img2)
-img_middle =rife_interpolation_model.after_interpolation(img_middle)
+img_middle = rife_interpolation_model.after_interpolation(img_middle)
 
 # If you want to predict several images between img1 and img2
+img1 = np.random.rand(100, 200, 3) # replace by real section image
+img2 = np.random.rand(100, 200, 3) # replace by real section image
 interpolated_imgs = PairInterpolate(n_repeat=3)(img1, img2, rife_interpolation_model)
 ``` 
 
-- One can predict optical flow between any pair of images and use it to create a new image. 
-Please make sure that `optical` extra dependencies are installed.
+### Optical Flow Models
+
+#### Setup
+
+If you want to use one of the optical flow models, please make sure that `optical`
+extra dependencies are installed.
 ```shell
 pip install git+https://github.com/BlueBrain/atlas-interpolation#egg=atlinter[optical]
 ```
+
+One also needs to download/pull the specific checkpoints of the model:
+```shell
+cd data
+
+dvc pull checkpoints/RAFT.dvc               # RAFT model
+dvc pull checkpoints/maskflownet.params.dvc # MaskFlowNet model
+```
+
+#### Example Code
 
 ```python
 from atlinter.optical_flow import MaskFlowNet
@@ -151,9 +196,9 @@ checkpoint_path = "data/checkpoints/maskflownet.params"
 net = MaskFlowNet(checkpoint_path)
 
 # Predict flow between img1 and img2
-img1 = ...
-img2 = ...
-img3 = ...
+img1 = np.random.rand(100, 200, 3) # replace by real section image
+img2 = np.random.rand(100, 200, 3) # replace by real section image
+img3 = np.random.rand(100, 200, 3) # replace by real section image
 img1, img2 = net.preprocess_images(img1=img1, img2=img2)
 predicted_flow = net.predict_flow(img1=img1, img2=img2)
 
@@ -161,9 +206,14 @@ predicted_flow = net.predict_flow(img1=img1, img2=img2)
 predicted_img = net.warp_image(predicted_flow, img3)
 ``` 
 
-- One can predict a given slice or an entire gene volume. 
+### Predict entire gene volume
+
+#### Setup
+
 Please make sure to have the dataset `Vip` locally before running the code snippet.
 If it is not the case, please download it by following the [Data](#data) section instructions.
+
+#### Example Code
 
 ```python
 import json
@@ -172,8 +222,8 @@ import numpy as np
 
 from atlinter.data import GeneDataset
 from atlinter.pair_interpolation import (
-GeneInterpolate, 
-RIFEPairInterpolationModel
+   GeneInterpolate,
+   RIFEPairInterpolationModel,
 )
 from atlinter.vendor.rife.RIFE_HD import Model as RifeModel
 from atlinter.vendor.rife.RIFE_HD import device as rife_device
