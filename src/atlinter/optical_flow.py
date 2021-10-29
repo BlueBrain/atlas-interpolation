@@ -125,7 +125,7 @@ class MaskFlowNet(OpticalFlow):
 
     from atlinter.vendor.MaskFlowNet import network, predict_new_data
 
-    def __init__(self, checkpoint_path, gpu_device="0"):
+    def __init__(self, checkpoint_path, gpu_device=""):
         config_file = {
             "network": {"class": "MaskFlownet"},
             "optimizer": {
@@ -218,11 +218,11 @@ class RAFTNet(OpticalFlow):
 
     from atlinter.vendor.RAFT.raft import RAFT
 
-    def __init__(self, path, device="cuda"):
+    def __init__(self, path, device="cpu"):
         self.device = device
         args = self.initialize_namespace()
         self.model = torch.nn.DataParallel(self.RAFT(args))
-        self.model.load_state_dict(torch.load(path))
+        self.model.load_state_dict(torch.load(path, map_location=torch.device(device)))
         self.model = self.model.module
         if self.device == "cuda":
             self.model.to(self.device)
@@ -262,14 +262,24 @@ class RAFTNet(OpticalFlow):
         if img1.shape != img2.shape:
             raise ValueError("The two images have not the same shape!")
 
+        # The image dimensions need to be divisible by 8
+        self.shape = np.array(img1.shape[:2])
+        pad_x, pad_y = ((self.shape - 1) // 8 + 1) * 8 - self.shape
+
         if np.max(img1) <= 1:
             img1 = (img1 * 255).astype(np.uint8)
             img2 = (img2 * 255).astype(np.uint8)
 
         if len(img1.shape) == 2:
+            img1 = np.pad(img1, ((0, pad_x), (0, pad_y)))
+            img2 = np.pad(img2, ((0, pad_x), (0, pad_y)))
+
             img1 = np.repeat(img1[np.newaxis], 3, axis=0)
             img2 = np.repeat(img2[np.newaxis], 3, axis=0)
         else:
+            img1 = np.pad(img1, ((0, pad_x), (0, pad_y), (0, 0)))
+            img2 = np.pad(img2, ((0, pad_x), (0, pad_y), (0, 0)))
+
             img1 = np.transpose(img1, (2, 0, 1))
             img2 = np.transpose(img2, (2, 0, 1))
 
@@ -300,6 +310,7 @@ class RAFTNet(OpticalFlow):
         if self.device == "cuda":
             flow_up = flow_up.cpu()
         flow = flow_up.detach().numpy()[0]
+        flow = flow[:, : self.shape[0], : self.shape[1]]
         return flow
 
 

@@ -258,16 +258,23 @@ class RIFEPairInterpolationModel(PairInterpolationModel):
         interpolated_images : np.ndarray
             The stacked interpolated images.
             If input images are grayscale,
-            the dimension should be (n_img, height, width).
+            the dimension should be (n_img, height, width) or (height, width).
             If input images are RGB image,
-            the dimension should be (n_img, height, width, 3).
+            the dimension should be (n_img, height, width, 3) or (height, width, 3).
 
         Returns
         -------
         np.ndarray
             The stacked interpolated images with padding removed.
         """
-        return interpolated_images[:, : self.shape[0], : self.shape[1]]
+        # No n_img dimension: (height, width) or (height, width, 3)
+        if len(interpolated_images.shape) == 2 or (
+            len(interpolated_images.shape) == 3 and interpolated_images.shape[-1] == 3
+        ):
+            return interpolated_images[: self.shape[0], : self.shape[1]]
+        # n_img dimension: (n_img, height, width) or (n_img, height, width, 3)
+        else:
+            return interpolated_images[:, : self.shape[0], : self.shape[1]]
 
 
 class CAINPairInterpolationModel(PairInterpolationModel):
@@ -477,7 +484,9 @@ class GeneInterpolate:
         if self.axis == "sagittal":
             self.gene_volume = np.moveaxis(self.gene_volume, 2, 0)
 
-    def get_interpolation(self, left: int, right: int) -> tuple[np.ndarray, np.ndarray]:
+    def get_interpolation(
+        self, left: int, right: int
+    ) -> tuple[np.ndarray | None, np.ndarray | None]:
         """Compute the interpolation for a pair of images.
 
         Parameters
@@ -489,15 +498,18 @@ class GeneInterpolate:
 
         Returns
         -------
-        interpolated_images : np.array
+        interpolated_images : np.array or None
             Interpolated image for the given pair of images.
             Array of shape (N, dim1, dim2, 3) with N the number of
             interpolated images.
-        predicted_section_numbers : np.array
+        predicted_section_numbers : np.array or None
             Slice value of the predicted images.
             Array of shape (N, 1) with N the number of interpolated images.
         """
         diff = right - left
+        if diff == 0:
+            return None, None
+
         n_repeat = self.get_n_repeat(diff)
 
         pair_interpolate = PairInterpolate(n_repeat=n_repeat)
@@ -534,6 +546,8 @@ class GeneInterpolate:
                 interpolated_images,
                 predicted_section_numbers,
             ) = self.get_interpolation(left, right)
+            if interpolated_images is None:
+                continue
             all_interpolated_images.append(interpolated_images)
             all_predicted_section_numbers.append(predicted_section_numbers)
 

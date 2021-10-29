@@ -97,7 +97,7 @@ def test_raftnet_model(monkeypatch, rgb):
 
     preimg1, preimg2 = raft.preprocess_images(img1, img2)
     assert isinstance(preimg1, np.ndarray) and isinstance(preimg2, np.ndarray)
-    expected_shape = (1, 3, 10, 10)
+    expected_shape = (1, 3, 16, 16)
     assert (preimg1.shape == expected_shape) and (preimg2.shape == expected_shape)
     assert preimg1.dtype == np.uint8 and preimg2.dtype == np.uint8
     assert 1 < np.max(preimg1) <= 255 and 1 < np.max(preimg2) <= 255
