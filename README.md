@@ -9,8 +9,8 @@ continuous volume. This package explores techniques that allow to interpolate
 the missing slices and thus reconstruct whole gene expression volumes.
 
 * [Installation](#installation)
-    * [Installation from source](#installation-from-source)
-    * [Installation for development](#installation-for-development)
+    * [Python Version and Environment](#python-version-and-environment)
+    * [Install "Atlas Interpolation"](#install-atlas-interpolation)
 * [Data](#data)
     * [Downloading data from scratch](#downloading-data-from-scratch) 
     * [Pulling from the remote](#pulling-from-the-remote)
@@ -23,10 +23,12 @@ the missing slices and thus reconstruct whole gene expression volumes.
 * [Funding & Acknowledgment](#funding--acknowledgment)
 
 ## Installation
-
+### Python Version and Environment
 Note that due to some of our dependencies we're currently limited to python
 version `3.7`. Please make sure you set up a virtual environment with that
-version before trying to install this library.
+version before trying to install this library. If you're unsure how to do that
+please have a look at [conda](https://docs.conda.io) or
+[pyenv](https://github.com/pyenv/pyenv).
 
 If you are part of the Blue Brain Project and are working on the BB5 you can
 find the correct python version in the archive modules between `archive/2020-02`
@@ -41,21 +43,27 @@ python -m venv venv
 python --version
 ```
 
-We also recommend that you make sure that `pip` is up to date and that the
+We also recommend that you make sure that `pip` is up-to-date and that the
 packages `wheel` and `setuptools` are installed:
 ```shell
 pip install --upgrade pip wheel setuptools
 ```
 
-### Installation from source
-If you want to try the latest version, you can install from source.
-
+### Install "Atlas Interpolation"
+In order to access the data and the example scripts a local clone of this
+repository is required. Run these commands to get it:
 ```shell
-pip install git+https://github.com/BlueBrain/atlas-interpolation
+git clone https://github.com/BlueBrain/atlas-interpolation
+cd atlas-interpolation
+```
+
+The "Atlas Interpolation" package can now be installed directly from the clone
+we just created:
+```shell
+pip install '.[data, optical]'
 ```
 
 ## Data
-
 The data for this project is managed using the DVC tool. There are two options to
 get the data:
 - Download them from scratch
