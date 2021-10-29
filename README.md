@@ -54,16 +54,6 @@ If you want to try the latest version, you can install from source.
 pip install git+https://github.com/BlueBrain/atlas-interpolation
 ```
 
-### Installation for development
-If you want a dev install, you should install the latest version from 
-source with all the extra requirements for running test.
-
-```shell
-git clone https://github.com/BlueBrain/atlas-interpolation
-cd atlas-interpolation
-pip install -e '.[data, dev, optical]'
-```
-
 ## Data
 
 The data for this project is managed using the DVC tool. There are two options to
