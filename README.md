@@ -64,20 +64,92 @@ pip install '.[data, optical]'
 ```
 
 ## Data
-The data for this project is managed using the DVC tool. There are two options to
-get the data:
-- Download them from scratch
-- Pull the pre-downloaded data from a remote machine (on the BBP intranet)
+The data for this project is managed by the DVC tool and all related files
+are located in the `data` directory. The DVC tool has already been installed
+together with the "Atlas Interpolation" package. Every time you need to run a
+DVC command (`dvc ...`) make sure to change to the `data` directory first
+(`cd data`).
 
-In either case, one needs to clone the repository and install the extra `data` dependencies.
+### Remote Storage Access
+We have already prepared all the data, but it is located on a remote storage
+that is only accessible to people within the Blue Brain Project who have
+access permissions to project `proj101`. If you're unsure you can test your
+permissions with the following command:
 ```shell
-git clone https://github.com/BlueBrain/atlas-interpolation
-cd atlas-interpolation/data
-pip install git+https://github.com/BlueBrain/atlas-interpolation#egg=atlinter[data]
+ssh bbpv1.bbp.epfl.ch \
+"ls /gpfs/bbp.cscs.ch/data/project/proj101/dvc_remotes"
+```
+Possible outcomes:
+```shell
+# Access OK
+atlas_annotation
+atlas_interpolation
+
+# Access denied
+ls: cannot open directory [...]: Permission denied
+```
+Depending on whether you have access to the remote storage in the following
+sections you will either pull the data from the remote (`dvc pull`) or download
+the input data manually and re-run the data processing pipelines to reproduce
+the output data (`dvc repro`).
+
+### Model Checkpoints
+Much of the functionality of "Atlas Interpolation" relies on pre-trained deep
+learning models. The model checkpoints that need to be loaded are part of the
+data.
+
+If you have access to the remote storage (see above) you can pull all model
+checkpoints from the remote:
+```shell
+cd data
+dvc pull checkpoints/rife.dvc
+dvc pull checkpoints/cain.dvc
+dvc pull checkpoints/maskflownet.params.dvc
+dvc pull checkpoints/RAFT.dvc
 ```
 
-Pulling/Download the entire DVC is a huge amount of data (several GBs),
-do not hesitate to select only the data you are interested in.
+If you don't have access to the remote you need to download the checkpoint files
+by hand and put the downloaded data into the `data/checkpoints` folder. You
+may not need all the checkpoints depending on the examples you want to run. Here
+are the instructions for the four models we use: RIFE, CAIN, MaskFlowNet, and
+RAFT:
+* **RIFE**: download the checkpoint from a shared Google Drive folder by following
+  [this link](https://drive.google.com/file/d/1wsQIhHZ3Eg4_AfCXItFKqqyDMB4NS0Yd/view?usp=sharing).
+  Unzip the contents of the downloaded file into `data/checkpoints/rife`.
+  [[ref]](https://github.com/hzwer/arXiv2020-RIFE/tree/6ff174584737a9aa27cd9654443a8a79c76799c9#usage)
+* **CAIN**: download the checkpoint from a shared Dropbox folder by following
+  [this link](https://www.dropbox.com/s/y1xf46m2cbwk7yf/pretrained_cain.pth?dl=0).
+  Move the downloaded file to `data/checkpoints/cain`.
+  [[ref]](https://github.com/myungsub/CAIN/tree/2e727d2a07d3f1061f17e2edaa47a7fb3f7e62c5#interpolating-with-custom-video)
+* **MaskFlowNet**: download the checkpoint directly from GitHub by following
+  [this link](https://github.com/microsoft/MaskFlownet/raw/5cba12772e2201f0d1c1e27161d224e585334571/weights/8caNov12-1532_300000.params).
+  Rename the file to `maskflownet.params` and move it to `data/checkpoints`.
+  [[ref]](https://github.com/microsoft/MaskFlownet/raw/5cba12772e2201f0d1c1e27161d224e585334571/weights)
+* **RAFT**: downlaod the checkpoint files from a shared Dropbox folder by following
+  [this link](https://drive.google.com/drive/folders/1sWDsfuZ3Up38EUQt7-JDTT1HcGHuJgvT?usp=sharing).
+  Move all downloaded `.pth` files to the `data/checkpoints/RAFT/models` folder.
+  [[ref]](https://github.com/princeton-vl/RAFT/tree/224320502d66c356d88e6c712f38129e60661e80#demos)
+
+If you downloaded all checkpoints or pulled them from the remote you should
+have the following files:
+```text
+data
+└── checkpoints
+    ├── RAFT
+    │   ├── models
+    │   │   ├── raft-chairs.pth
+    │   │   ├── raft-kitti.pth
+    │   │   ├── raft-sintel.pth
+    │   │   ├── raft-small.pth
+    │   │   └── raft-things.pth
+    ├── cain
+    │   └── pretrained_cain.pth
+    ├── maskflownet.params
+    └── rife
+        ├── contextnet.pkl
+        ├── flownet.pkl
+        └── unet.pkl
+```
 
 ### Downloading data from scratch
 Downloading data from scratch can be done easily using dvc command.
