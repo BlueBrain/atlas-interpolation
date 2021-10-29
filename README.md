@@ -64,11 +64,11 @@ pip install '.[data, optical]'
 ```
 
 ## Data
-The data for this project is managed by the DVC tool and all related files
-are located in the `data` directory. The DVC tool has already been installed
-together with the "Atlas Interpolation" package. Every time you need to run a
-DVC command (`dvc ...`) make sure to change to the `data` directory first
-(`cd data`).
+The data for this project is managed by the [DVC tool](https://dvc.org/) and all
+related files are located in the `data` directory. The DVC tool has already been
+installed together with the "Atlas Interpolation" package. Every time you need
+to run a DVC command (`dvc ...`) make sure to change to the `data` directory
+first (`cd data`).
 
 ### Remote Storage Access
 We have already prepared all the data, but it is located on a remote storage
@@ -92,6 +92,14 @@ Depending on whether you have access to the remote storage in the following
 sections you will either pull the data from the remote (`dvc pull`) or download
 the input data manually and re-run the data processing pipelines to reproduce
 the output data (`dvc repro`).
+
+If you work on the BB5 and have access to the remote storage then run the
+following command to short-circuit the remote access (because the remote is
+located on the BB5 itself):
+```shell
+dvc remote add --local gpfs_proj101 \
+/gpfs/bbp.cscs.ch/data/project/proj101/dvc_remotes/atlas_interpolation
+```
 
 ### Model Checkpoints
 Much of the functionality of "Atlas Interpolation" relies on pre-trained deep
@@ -151,62 +159,48 @@ data
         └── unet.pkl
 ```
 
-### Downloading data from scratch
-Downloading data from scratch can be done easily using dvc command.
-```shell
-dvc repro
-```
-This step might take some time.
+### Section Images and Datasets
+The purpose of the "Atlas Interpolation" package is to interpolate missing
+section images within section image datasets. This section explains how to
+obtain these data.
 
-In some cases you might not need all data. Then it is possible to download unprepared
-data that you need by running specific DVC stages. 
+Remember that if you don't have access to the remote storage (see above) you'll
+need to use the `dvc repro` commands that download/process the data live. If
+you do have access, you'll use `dvc pull` instead, which is faster.
+
+Normally it's not necessary to get all data. Due to its size it may take a lot
+of disk space as well as time to download and pre-process. If you still decide
+to do so you can by running `dvc repro` or `dvc pull` without any parameters.
+
+Specific examples only require specific data. You can use DVC to list all data
+pipeline stages to find out which stage produces the data you're interested in.
+To list all data pipeline stages run:
 ```shell
-dvc repro download-nissl # To download nissl volume
-dvc repro download_dataset # To download all listed genes in the dvc.yaml
-dvc repro download_dataset@Vip # To download specific gene expressions datasets, in this case Vip
-dvc repro download_special_dataset # To download all special datasets
+cd data
+dvc stage list
+```
+If, for example, you need data located in `data/aligned/coronal/Gad1`, then
+according to the output of command above the relevant stage is named
+`align@Gad1`. Therefore, you only need to run this stage to get the necessary
+data (replace `repro` by `pull` if you can access the remote storage):
+```shell
+dvc repro align@Gad1
 ```
 
-If one wants those volumes already aligned to the Nissl Brain Atlas, one can directly 
-launch one of the following commands:
-```shell
-dvc repro align
-dvc repro align@Vip
-dvc repro align_special_dataset
-```
-This will take some time, especially if the volumes are not already downloaded. 
-
-### Pulling from the remote
-This only works if you have access to `proj101` on BBP intranet. Otherwise, follow
-the previous section [Downloading data from scratch](#downloading-data-from-scratch)
+### New ISH datasets (advanced, optional)
+If you're familiar with the AIBS data that we're using and would like to add
+new ISH gene expressions that are not yet available as one of our pipeline
+stages (check the output of `dvc stage list`) then follow the following
 instructions.
 
-If you are working on the BB5 please run the following commands
-first:
-```shell
-dvc remote add --local gpfs_proj101 \
-/gpfs/bbp.cscs.ch/data/project/proj101/dvc_remotes/atlas_interpolation
-```
-
-To pull all original data from the remote run
-```shell
-dvc pull
-```
-
-It is also possible to selectively pull data with
-```shell
-dvc pull <filename>.dvc
-```
-where `<filename>` should be replaced by one of the filenames found in the `data` directory.
-
-### Downloading new ISH datasets
-If one is interested into downloading ISH gene expressions that are not already 
-part of our DVC pipeline (cf. list in [`data/dvc.yaml`](data/dvc.yaml)), one can
-directly add the name of the gene of interest in the `foreach` list and launch:
-```shell
-dvc repro download_dataset@NEW_GENE
-dvc repro align@NEW_GENE
-```
+1. Edit the file `data/dvc.yaml` and add the new gene name to the lists in the
+   `stages:download_dataset:foreach` and `stages:align:foreach` sections.
+2. Run the data downloading and processing pipelines (replace `NEW_GENE` by the
+   real gene name that you used in `data/dvc.yaml`):
+   ```shell
+   dvc repro download_dataset@NEW_GENE
+   dvc repro align@NEW_GENE
+   ```
 
 ## Examples
 
