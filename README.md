@@ -204,39 +204,34 @@ instructions.
    ```
 
 ## Examples
+In this section we showcase several typical use-cases of "Atlas Interpolation":
+- Use pair interpolation to predict an intermediate image between two given
+  images
+- Predict optical flow between any pair of images and use it to morph a third
+  image
+- In a gene expression volume predict missing slices and reconstruct the whole
+  volume
 
-Here are the different experiment one can do with `atlinter` package:
-- One can predict one/several images between a pair of images thanks to pair interpolation models
-- One can predict optical flow between any pair of images and use it to create a new image
-- One can predict a given slice or an entire gene volume.
+Note that all models accept both RGB images (`shape=(height, width, 3)`)
+and grayscale images (`shape=(height, width)`).
 
-Note that every models accept RGB images of shape `(height, width, 3)`
-and grayscale images of shape `(height, width)`.
-
-### Pair Interpolation Models
-
-#### Setup
-
-To use one of the pair interpolation models integrated in `atlinter` package,
-one needs first to download/pull the specific checkpoints of the model
+### Pair Interpolation
+The only data you need for this example is the RIFE model checkpoint. Follow
+the instructions in the corresponding section above to get it. If you have
+access to the remote data storage it's enough to run the following commands:
 ```shell
 cd data
-
-dvc pull checkpoints/rife.dvc  # RIFE model
-#dvc pull checkpoints/cain.dvc # CAIN model
+dvc pull checkpoints/rife.dvc
+cd ..
 ```
 
-If you are not able to pull:
-- For RIFE: please follow instructions from https://github.com/hzwer/arXiv2020-RIFE#cli-usage
-to download the model
-- For CAIN: please follow instructions from https://github.com/myungsub/CAIN#usage 
-to download the model
-
-#### Example Code
-
-Please be at the root folder of the project or change the `checkpoint_path`
-to run the example code below properly.
-
+In this example we start with a pair of images `img1` and `img2` (randomly
+generated for example's sake). First use the RIFE model to interpolate between
+them in a manual way and find the image in-between (`img_middle`). Then we
+demonstrate the use of the `PairInterpolate` class that streamlines the
+interpolation procedure. Starting with the same pair of images we iterate the
+interpolation three times to produce a stack of seven interpolated images
+(`interpolated_imgs`).
 ```python
 import numpy as np
 
@@ -244,22 +239,28 @@ from atlinter.vendor.rife.RIFE_HD import Model as RifeModel
 from atlinter.vendor.rife.RIFE_HD import device as rife_device
 from atlinter.pair_interpolation import PairInterpolate, RIFEPairInterpolationModel
 
-# Instantiate the Pair Interpolation model (in this case: RIFE)
+# Get the input images
+img1 = np.random.rand(100, 200, 3) # replace by real section image
+img2 = np.random.rand(100, 200, 3) # replace by real section image
+
+# Get the RIFE interpolation model
 checkpoint_path = "data/checkpoints/rife/" # Please change, if needed
 rife_model = RifeModel()
 rife_model.load_model(checkpoint_path, -1)
 rife_model.eval()
-rife_interpolation_model = RIFEPairInterpolationModel(rife_model, rife_device)
+interpolation_model = RIFEPairInterpolationModel(rife_model, rife_device)
 
-# Predict middle image between img1 and img2
-img1 = np.random.rand(100, 200, 3) # replace by real section image
-img2 = np.random.rand(100, 200, 3) # replace by real section image
-preimg1, preimg2 = rife_interpolation_model.before_interpolation(img1=img1, img2=img2)
-img_middle = rife_interpolation_model.interpolate(img1=preimg1, img2=preimg2)
-img_middle = rife_interpolation_model.after_interpolation(img_middle)
+# Manually predict middle image between img1 and img2
+preimg1, preimg2 = interpolation_model.before_interpolation(img1=img1, img2=img2)
+img_middle = interpolation_model.interpolate(img1=preimg1, img2=preimg2)
+img_middle = interpolation_model.after_interpolation(img_middle)
+print(img_middle.shape)
 
-# If you want to predict several images between img1 and img2
-interpolated_imgs = PairInterpolate(n_repeat=3)(img1, img2, rife_interpolation_model)
+# Streamline the interpolation using PairInterpolate and predict a stack
+# of 7 intermediate images
+interpolator = PairInterpolate(n_repeat=3)
+interpolated_imgs = interpolator(img1, img2, interpolation_model)
+print(interpolated_imgs.shape)
 ``` 
 
 ### Optical Flow Models
