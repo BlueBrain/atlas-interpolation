@@ -134,7 +134,7 @@ RAFT:
   [this link](https://github.com/microsoft/MaskFlownet/raw/5cba12772e2201f0d1c1e27161d224e585334571/weights/8caNov12-1532_300000.params).
   Rename the file to `maskflownet.params` and move it to `data/checkpoints`.
   [[ref]](https://github.com/microsoft/MaskFlownet/raw/5cba12772e2201f0d1c1e27161d224e585334571/weights)
-* **RAFT**: downlaod the checkpoint files from a shared Dropbox folder by following
+* **RAFT**: download the checkpoint files from a shared Dropbox folder by following
   [this link](https://drive.google.com/drive/folders/1sWDsfuZ3Up38EUQt7-JDTT1HcGHuJgvT?usp=sharing).
   Move all downloaded `.pth` files to the `data/checkpoints/RAFT/models` folder.
   [[ref]](https://github.com/princeton-vl/RAFT/tree/224320502d66c356d88e6c712f38129e60661e80#demos)
@@ -301,27 +301,44 @@ predicted_img = net.warp_image(predicted_flow, img3)
 print(predicted_img.shape)
 ``` 
 
-### Predict entire gene volume
-
-#### Setup
-
-Please make sure to have the dataset `Vip` locally before running the code snippet.
-If it is not the case, please download it:
+### Predict an Entire Gene Volume (Longer Runtime)
+The data you need for this example are the RIFE model checkpoint and the Vip
+gene expression dataset. To get the RIFE checkpoint follow the instruction in
+the corresponding section above. If you have access to the remote data storage
+it's enough to run the following commands:
 ```shell
 cd data
-
-dvc pull download_dataset@Vip
+dvc pull checkpoints/rife.dvc
+cd ..
 ```
-If you do not have access to `proj101`, please replace `dvc pull` by `dvc repro`.
-This might take some time.
-
-#### Example Code
+As described in the data section above, there are two ways of getting the Vip
+gene expression dataset. If you have access to the remote data storage you can
+pull it from there:
+```shell
+cd data
+dvc pull download_dataset@Vip
+cd ..
+```
+If you don't have access then you can re-download it. This should always work,
+but may take several minutes:
+```shell
+cd data
+dvc repro download_dataset@Vip
+cd ..
+```
 
 Please be at the root folder of the project or change the different paths
 to run the example code below properly. The code might take some time, especially
-the prediction of the entire volume (last line of the code), an environement
+the prediction of the entire volume (last line of the code), an environment
 with GPUs could speed up the runtime.
 
+In this example with start with a gene expression volume that has missing
+section images. First we load the image data and the metadata from disk and
+wrap it into a `GeneDataset` class. Then we instantiate the RIFE deep learning
+model that will be used for interpolation. We use this model to first predict a
+single slice in the volume, then we reconstruct the whole volume by predicting
+all intermediate slices. Note that this last step is computation-heavy and might
+therefore take some time.
 ```python
 import json
 
@@ -332,34 +349,41 @@ from atlinter.pair_interpolation import GeneInterpolate, RIFEPairInterpolationMo
 from atlinter.vendor.rife.RIFE_HD import Model as RifeModel
 from atlinter.vendor.rife.RIFE_HD import device as rife_device
 
-# 1.  Prepare dataset
-# 1.a Load gene and section numbers
+# Load the gene expression dataset from disk
 data_path = "data/sagittal/Vip/1102.npy"  # Change the path if needed
 data_json = "data/sagittal/Vip/1102.json" # Change the path if needed
-gene = np.load(data_path)
-with open(data_json) as f:
-    metadata = json.load(f)
-section_numbers = [int(s) for s in metadata["section_numbers"]]
+section_images = np.load(data_path)
+with open(data_json) as fh:
+    metadata = json.load(fh)
 
-# 1.b Instantiate GeneDataset
+section_numbers = [int(s) for s in metadata["section_numbers"]]
+axis = metadata["axis"]
+
+# Wrap the data into a GeneDataset class
 gene_dataset = GeneDataset(
-  gene,
+  section_images,
   section_numbers,
   volume_shape=(528, 320, 456, 3),
-  axis="sagittal"
+  axis=axis,
 )
 
-# 2. Choose and instantiate the model (for example RIFE)
-checkpoint_path = "data/checkpoints/rife/"  # Change the path if needed
+# Load the RIFE deep learning model that will be used for interpolation
+checkpoint_path = "data/checkpoints/rife"
 rife_model = RifeModel()
 rife_model.load_model(checkpoint_path, -1)
 rife_model.eval()
 rife_interpolation_model = RIFEPairInterpolationModel(rife_model, rife_device)
 
-# 3. Instantiate GeneInterpolate and predict specific slice or entire volume
+# Create a gene interpolator
 gene_interpolate = GeneInterpolate(gene_dataset, rife_interpolation_model)
+
+# Predict a single section image
 predicted_slice = gene_interpolate.predict_slice(10)
-predicted_volume = gene_interpolate.predict_volume()  # This might take some time.
+print(predicted_slice.shape)
+
+# Reconstruct the whole volume. This might take some time.
+predicted_volume = gene_interpolate.predict_volume()
+print(predicted_volume.shape)
 ```
 
 ## Vendors
