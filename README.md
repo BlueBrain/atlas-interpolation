@@ -264,52 +264,41 @@ print(interpolated_imgs.shape)
 ``` 
 
 ### Optical Flow Models
-
-#### Setup
-
-If you want to use one of the optical flow models, please make sure that `optical`
-extra dependencies are installed.
-```shell
-pip install git+https://github.com/BlueBrain/atlas-interpolation#egg=atlinter[optical]
-```
-
-One also needs to download/pull the specific checkpoints of the model:
+The only data you need for this example is the MaskFlowNet model checkpoint.
+Follow the instructions in the corresponding section above to get it. If you
+have access to the remote data storage it's enough to run the following
+commands:
 ```shell
 cd data
-
-dvc pull checkpoints/maskflownet.params.dvc # MaskFlowNet model
-#dvc pull checkpoints/RAFT.dvc              # RAFT model
+dvc pull checkpoints/maskflownet.params.dvc
+cd ..
 ```
 
-If you are not able to pull:
-- For MaskFlowNet: please go to https://github.com/microsoft/MaskFlownet/tree/master/weights
-and download `8caNov12-1532_300000.params` file.
-- For RAFT: please follow the instructions from https://github.com/princeton-vl/RAFT#demos
-to download the model.
-
-#### Example Code
-
-Please be at the root folder of the project or change the `checkpoint_path`
-to run the example code below properly.
-
+This example demonstrates how an optical flow model can be used to compute the
+optical flow between a pair of images. It can then be used to warp a third
+image. The images in this example are randomly generated. In a realistic setting
+they should be replaced by real images.
 ```python
 import numpy as np
 
 from atlinter.optical_flow import MaskFlowNet
 
-# Instantiate the Optical Flow model (in this case: MaskFlowNet)
-checkpoint_path = "data/checkpoints/maskflownet.params" # Please change, if needed
+# Instantiate an optical flow model (in this case: MaskFlowNet)
+checkpoint_path = "data/checkpoints/maskflownet.params"
 net = MaskFlowNet(checkpoint_path)
 
-# Predict flow between img1 and img2
-img1 = np.random.rand(100, 200, 3) # replace by real section image
-img2 = np.random.rand(100, 200, 3) # replace by real section image
-img3 = np.random.rand(100, 200, 3) # replace by real section image
+# Prepare random images. Should be replaced by real section images
+img1 = np.random.rand(100, 200, 3)
+img2 = np.random.rand(100, 200, 3)
+img3 = np.random.rand(100, 200, 3)
+
+# Predict the optical flow between img1 and img2
 img1, img2 = net.preprocess_images(img1=img1, img2=img2)
 predicted_flow = net.predict_flow(img1=img1, img2=img2)
 
-# If you want to predict images thanks to optical flow
+# Warp a third image using the optical flow
 predicted_img = net.warp_image(predicted_flow, img3)
+print(predicted_img.shape)
 ``` 
 
 ### Predict entire gene volume
