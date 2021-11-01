@@ -17,9 +17,9 @@ the missing slices and thus reconstruct whole gene expression volumes.
     * [Section Images and Datasets](#section-images-and-datasets)
     * [New ISH datasets (advanced, optional)](#new-ish-datasets-advanced-optional)
 * [Examples](#examples)
-    * [Pair Interpolation Models](#pair-interpolation-models)
+    * [Pair Interpolation](#pair-interpolation)
     * [Optical Flow Models](#optical-flow-models)
-    * [Predict Entire Gene Volume](#predict-entire-gene-volume)
+    * [Predict an Entire Gene Volume (longer runtime)](#predict-an-entire-gene-volume-longer-runtime)
 * [Vendors](#vendors)
 * [Funding & Acknowledgment](#funding--acknowledgment)
 
