@@ -126,9 +126,9 @@ may not need all the checkpoints depending on the examples you want to run. Here
 are the instructions for the four models we use: RIFE, CAIN, MaskFlowNet, and
 RAFT:
 * **RIFE**: download the checkpoint from a shared Google Drive folder by following
-  [this link](https://drive.google.com/file/d/1wsQIhHZ3Eg4_AfCXItFKqqyDMB4NS0Yd/view?usp=sharing).
+  [this link](https://drive.google.com/file/d/11l8zknO1V5hapv2-Ke4DG9mHyBomS0Fc/view?usp=sharing).
   Unzip the contents of the downloaded file into `data/checkpoints/rife`.
-  [[ref]](https://github.com/hzwer/arXiv2020-RIFE/tree/6ff174584737a9aa27cd9654443a8a79c76799c9#usage)
+  [[ref]](https://github.com/hzwer/arXiv2020-RIFE/tree/2a1eafe27d5ff12eb31df96e47352fe30c18ac46#usage)
 * **CAIN**: download the checkpoint from a shared Dropbox folder by following
   [this link](https://www.dropbox.com/s/y1xf46m2cbwk7yf/pretrained_cain.pth?dl=0).
   Move the downloaded file to `data/checkpoints/cain`.
