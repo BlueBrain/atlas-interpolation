@@ -98,8 +98,10 @@ If you work on the BB5 and have access to the remote storage then run the
 following command to short-circuit the remote access (because the remote is
 located on the BB5 itself):
 ```shell
+cd data
 dvc remote add --local gpfs_proj101 \
-/gpfs/bbp.cscs.ch/data/project/proj101/dvc_remotes/atlas_interpolation
+  /gpfs/bbp.cscs.ch/data/project/proj101/dvc_remotes/atlas_interpolation
+cd ..
 ```
 
 ### Model Checkpoints
@@ -115,6 +117,7 @@ dvc pull checkpoints/rife.dvc
 dvc pull checkpoints/cain.dvc
 dvc pull checkpoints/maskflownet.params.dvc
 dvc pull checkpoints/RAFT.dvc
+cd ..
 ```
 
 If you don't have access to the remote you need to download the checkpoint files
