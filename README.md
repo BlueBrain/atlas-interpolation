@@ -327,11 +327,6 @@ dvc repro download_dataset@Vip
 cd ..
 ```
 
-Please be at the root folder of the project or change the different paths
-to run the example code below properly. The code might take some time, especially
-the prediction of the entire volume (last line of the code), an environment
-with GPUs could speed up the runtime.
-
 In this example with start with a gene expression volume that has missing
 section images. First we load the image data and the metadata from disk and
 wrap it into a `GeneDataset` class. Then we instantiate the RIFE deep learning
