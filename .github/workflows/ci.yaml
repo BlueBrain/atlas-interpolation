@@ -22,13 +22,12 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y python3-opencv
           python -m pip install -U pip
-          pip install -U pip setuptools setuptools_scm[toml] wheel
+          pip install -U pip setuptools wheel
           pip install tox
       - name: Run linting
         run: tox -vv -e lint
       - name: Run unit tests
         run: |
-          apt-get update && apt-get install -y python3-opencv
           pip install ".[optical]"
           pip install -r requirements.txt
           pip install -U pytest pytest-cov
