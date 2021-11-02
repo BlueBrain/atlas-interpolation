@@ -1,0 +1,33 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  all:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest commit
+        uses: actions/checkout@v2
+        with: {"fetch-depth": 0}  # fetch all history with version tags
+      - name: Set up python
+        uses: actions/setup-python@v2
+        with: {"python-version": "3.7"}
+      - name: Set up pip cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-${{ hashFiles('setup.py') }}
+      - name: Set up the environment
+        run: |
+          # sudo apt-get update && sudo apt-get install -y python3-opencv
+          python -m pip install -U pip
+          pip install -U pip setuptools wheel
+          pip install tox
+      - name: Run linting
+        run: tox -vv -e lint
+      - name: Run unit tests
+        run: |
+          pip install ".[optical]"
+          pip install -U pytest pytest-cov
+          pytest --color=yes --durations=5 -v -m "" --cov
