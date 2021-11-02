@@ -30,4 +30,4 @@ jobs:
         run: |
           pip install ".[optical]"
           pip install -U pytest pytest-cov
-          pytest --color=yes --durations=5 -v -m ""
+          pytest --color=yes --durations=5 -v -m "" --cov
