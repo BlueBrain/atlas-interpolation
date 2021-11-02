@@ -52,6 +52,7 @@ exclude_patterns = []
 #
 html_theme = "sphinx-bluebrain-theme"
 html_theme_options = {
+    "metadata_distribution": "atlinter",
     "repo_name": "atlas-interpolation",
     "repo_url": "https://github.com/BlueBrain/atlas-interpolation",
 }

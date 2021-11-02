@@ -63,6 +63,7 @@ extras_require = {
 setup(
     name="atlinter",
     author="Blue Brain Project, EPFL",
+    license="Apache-2.0",
     use_scm_version={
         "write_to": "src/atlinter/version.py",
         "write_to_template": '"""The package version."""\n__version__ = "{version}"\n',
@@ -73,8 +74,8 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/BlueBrain/atlas-interpolation",
     project_urls={
-        "Source Code": "https://github.com/BlueBrain/atlas-interpolation",
-        "Bug Tracker": "https://github.com/BlueBrain/atlas-interpolation/issues",
+        "Source": "https://github.com/BlueBrain/atlas-interpolation",
+        "Tracker": "https://github.com/BlueBrain/atlas-interpolation/issues",
     },
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
