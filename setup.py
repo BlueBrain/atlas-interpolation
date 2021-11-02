@@ -49,6 +49,10 @@ extras_require = {
         "pytest-cov",
         "tox",
     ],
+    "docs": [
+        "sphinx",
+        "sphinx-bluebrain-theme",
+    ],
     "optical": [
         "opencv-python",
         "flow_vis",

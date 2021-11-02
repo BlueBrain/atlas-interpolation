@@ -62,7 +62,7 @@ class OpticalFlow(ABC):
         Returns
         -------
         flow : np.ndarray
-            The optical flow of shape (*image.shape, 2).
+            The optical flow of shape ``(*image.shape, 2)``.
         """
 
     @classmethod
@@ -72,11 +72,12 @@ class OpticalFlow(ABC):
         Parameters
         ----------
         flow : np.ndarray
-            The predicted optical flow of shape (*image.shape, 2).
+            The predicted optical flow of shape ``(*image.shape, 2)``.
         img2 : np.ndarray
             The right image.
         order : int
-            The interpolation order. 0 = nearest neighbour, 1 = linear, 2 = cubic, etc.
+            The interpolation order. 0 = nearest neighbour, 1 = linear,
+            2 = cubic, etc.
 
         Returns
         -------
@@ -111,9 +112,11 @@ class MaskFlowNet(OpticalFlow):
     """MaskFlowNet model for optical flow computation.
 
     The typical use is
+
     >>> from atlinter.optical_flow import MaskFlowNet
-    >>> checkpoint_path = "data/checkpoints/maskflownet.params"
-    >>> net = MaskFlowNet(checkpoint_path)
+    >>> checkpoint = "data/checkpoints/maskflownet.params"
+    >>> # Make sure the checkpoint exists and uncomment the following line
+    >>> # net = MaskFlowNet(checkpoint)
 
     Parameters
     ----------
@@ -204,9 +207,11 @@ class RAFTNet(OpticalFlow):
     """RAFT model for optical flow computation.
 
     The typical use is
+
     >>> from atlinter.optical_flow import RAFTNet
-    >>> path = "data/checkpoints/RAFT/models/raft-things.pth"
-    >>> net = RAFTNet(path)
+    >>> checkpoint = "data/checkpoints/RAFT/models/raft-things.pth"
+    >>> # Make sure the checkpoint exists and uncomment the following line
+    >>> # net = RAFTNet(checkpoint)
 
     Parameters
     ----------
@@ -320,12 +325,13 @@ class GeneOpticalFlow:
     Parameters
     ----------
     gene_data
-        Gene Dataset. It contains a `volume` of reference shape
-        with all known slices located at the right place and a `metadata` dictionary
-        containing information about the axis of the dataset and the section numbers.
+        Gene Dataset. It contains a ``volume`` of reference shape
+        with all known slices located at the right place and a ``metadata``
+        dictionary containing information about the axis of the dataset and the
+        section numbers.
     reference_volume
-        Reference volume used to compute optical flow. It needs to be of same shape
-        as gene_data.volume.
+        Reference volume used to compute optical flow. It needs to be of same
+        shape as ``gene_data.volume``.
     model
         Model computing flow between two images.
     """
@@ -364,12 +370,13 @@ class GeneOpticalFlow:
         Returns
         -------
         flow : np.ndarray
-            Predicted flow between the two given sections of the reference volume.
+            Predicted flow between the two given sections of the reference
+            volume.
 
         Raises
         ------
         ValueError
-            If one of the two slice_numbers is out of the boundaries
+            If one of the ``idx_from`` and ``idx_to`` is out of the boundaries
             of the reference space.
         """
         n_slices = len(self.gene_volume)
@@ -400,9 +407,9 @@ class GeneOpticalFlow:
         Returns
         -------
         np.ndarray
-            Predicted gene slice. Array of shape (dim1, dim2, 3)
-            being (528, 320) for sagittal dataset and
-            (320, 456) for coronal dataset.
+            Predicted gene slice. Array of shape ``(dim1, dim2, 3)``
+            being ``(528, 320)`` for sagittal dataset and
+            ``(320, 456)`` for coronal dataset.
         """
         closest = self.gene_data.get_closest_known(slice_number)
         flow = self.predict_ref_flow(slice_number, closest)
@@ -420,7 +427,7 @@ class GeneOpticalFlow:
         Returns
         -------
         np.ndarray
-            Entire gene volume. Array of shape of the volume GeneDataset.
+            Entire gene volume. Array of shape of the volume ``GeneDataset``.
         """
         volume_shape = self.gene_volume.shape
         volume = np.zeros(volume_shape)
