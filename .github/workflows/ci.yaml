@@ -38,14 +38,11 @@ jobs:
         run: |
           # sudo apt-get update && sudo apt-get install -y python3-opencv
           pip install -U pip setuptools wheel
-          pip install tox
-      - name: Run linting
-        run: tox -e lint
+          pip install pytest pytest-cov
+      - name: Install atlinter
+        run: pip install ".[optical]"
       - name: Run unit tests
-        run: |
-          pip install ".[optical]"
-          pip install -U pytest pytest-cov
-          pytest --color=yes --durations=5 -v -m "" --cov
+        run: pytest --color=yes --durations=5 -v -m "" --cov
   docs:
     runs-on: ubuntu-latest
     steps:
