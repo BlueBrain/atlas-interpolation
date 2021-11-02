@@ -28,7 +28,7 @@ jobs:
         run: tox -vv -e lint
       - name: Run unit tests
         run: |
-          pip install ".[optical]"
           pip install -r requirements.txt
+          pip install ".[optical]"
           pip install -U pytest pytest-cov
           pytest --color=yes
