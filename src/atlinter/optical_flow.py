@@ -114,8 +114,9 @@ class MaskFlowNet(OpticalFlow):
     The typical use is
 
     >>> from atlinter.optical_flow import MaskFlowNet
-    >>> checkpoint_path = "data/checkpoints/maskflownet.params"
-    >>> net = MaskFlowNet(checkpoint_path)
+    >>> checkpoint = "data/checkpoints/maskflownet.params"
+    >>> # Make sure the checkpoint exists and uncomment the following line
+    >>> # net = MaskFlowNet(checkpoint)
 
     Parameters
     ----------
@@ -208,8 +209,9 @@ class RAFTNet(OpticalFlow):
     The typical use is
 
     >>> from atlinter.optical_flow import RAFTNet
-    >>> path = "data/checkpoints/RAFT/models/raft-things.pth"
-    >>> net = RAFTNet(path)
+    >>> checkpoint = "data/checkpoints/RAFT/models/raft-things.pth"
+    >>> # Make sure the checkpoint exists and uncomment the following line
+    >>> # net = RAFTNet(checkpoint)
 
     Parameters
     ----------
