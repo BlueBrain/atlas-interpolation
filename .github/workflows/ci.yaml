@@ -20,7 +20,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('setup.py') }}-${{ hashFiles('requirements.txt') }}
       - name: Set up the environment
         run: |
-          sudo apt-get update && sudo apt-get install -y python3-opencv
+          # sudo apt-get update && sudo apt-get install -y python3-opencv
           python -m pip install -U pip
           pip install -U pip setuptools wheel
           pip install tox
