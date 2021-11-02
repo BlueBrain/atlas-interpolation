@@ -16,7 +16,7 @@ jobs:
         with:
           path: ~/.cache/pip
           key: lint-${{ runner.os }}-${{ hashFiles('tox.ini') }}
-      - name: Set up the environment
+      - name: Install tox
         run: python -m pip install tox
       - name: Run linting
         run: tox -e lint
@@ -51,7 +51,6 @@ jobs:
     steps:
       - name: Checkout latest commit
         uses: actions/checkout@v2
-        with: {"fetch-depth": 0}  # fetch all history with version tags
       - name: Set up python
         uses: actions/setup-python@v2
         with: {"python-version": "3.7"}
@@ -60,12 +59,9 @@ jobs:
         with:
           path: ~/.cache/pip
           key: docs-${{ runner.os }}-${{ hashFiles('setup.py') }}
-      - name: Set up the environment
-        run: |
-          pip install -U pip setuptools wheel
-          pip install tox
+      - name: Install tox
+        run: pip install tox
       - name: Check the API docs
         run: tox -e apidoc-check
       - name: Build and check the docs
-        run: |
-          tox -e docs
+        run: tox -e docs
