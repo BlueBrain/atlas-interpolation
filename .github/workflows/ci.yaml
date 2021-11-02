@@ -25,9 +25,14 @@ jobs:
           pip install -U pip setuptools wheel
           pip install tox
       - name: Run linting
-        run: tox -vv -e lint
+        run: tox -e lint
+      - name: Check the API docs
+        run: tox -e apidoc-check
       - name: Run unit tests
         run: |
           pip install ".[optical]"
           pip install -U pytest pytest-cov
           pytest --color=yes --durations=5 -v -m "" --cov
+      - name: Build and check the docs
+        run: |
+          tox -e docs
