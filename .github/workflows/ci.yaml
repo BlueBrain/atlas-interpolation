@@ -17,7 +17,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-${{ hashFiles('setup.py') }}-${{ hashFiles('requirements.txt') }}
+          key: ${{ runner.os }}-${{ hashFiles('setup.py') }}
       - name: Set up the environment
         run: |
           # sudo apt-get update && sudo apt-get install -y python3-opencv
@@ -28,7 +28,6 @@ jobs:
         run: tox -vv -e lint
       - name: Run unit tests
         run: |
-          pip install -r requirements.txt
           pip install ".[optical]"
           pip install -U pytest pytest-cov
           pytest --color=yes
