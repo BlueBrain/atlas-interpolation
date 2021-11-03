@@ -28,7 +28,7 @@ install_requires = [
 ]
 extras_require = {
     "data": [
-        "atlannot @ git+https://bbpgitlab.epfl.ch/project/proj101/atlas_annotation.git",
+        "atlannot",
         "atldld==0.2.2",
         "dvc[ssh]",
         "pillow",
