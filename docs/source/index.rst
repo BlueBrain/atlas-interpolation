@@ -17,10 +17,3 @@ the missing slices and thus reconstruct whole gene expression volumes.
    :caption: API Reference
 
    api/atlinter
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
