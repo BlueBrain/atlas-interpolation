@@ -1,5 +1,7 @@
 # Atlas Interpolation
 
+<img src="docs/_images/Blue-Brain-Atlas-Interpolation-Github-banner.jpg"/>
+
 The Allen Brain Institute hosts a rich database of mouse brain imagery. It
 contains a large number of gene expression datasets obtained
 through the in situ hybridization (ISH) staining. While for a given gene
