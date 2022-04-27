@@ -640,6 +640,6 @@ class GeneInterpolate:
         left: int, right: int, n_repeat: int
     ) -> np.ndarray:
         """Get slice values of predicted images."""
-        n_steps = 2 ** n_repeat + 1
+        n_steps = 2**n_repeat + 1
         predicted_section_numbers = np.linspace(left, right, n_steps)
         return predicted_section_numbers[1:-1]
