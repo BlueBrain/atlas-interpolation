@@ -54,14 +54,15 @@ class GeneDataset:
                 "* 4 dimensions (n_genes, dim1, dim2, 3) for RBG images."
             )
         self.gene = gene
-        self.known_slices = section_numbers
-        self.axis = axis
         self.volume_shape = volume_shape
+        self.axis = axis
+
+        end = volume_shape[0] if self.axis == "coronal" else volume_shape[2]
+        slices = [s for s in section_numbers if s < end]
+        self.known_slices = slices
 
         # Create volume
         self.volume = np.zeros(volume_shape)
-        end = volume_shape[0] if self.axis == "coronal" else volume_shape[2]
-        slices = [s for s in self.known_slices if s < end]
 
         # Populate volume with known gene slices
         if self.axis == "coronal":
