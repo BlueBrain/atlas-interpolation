@@ -14,6 +14,7 @@
 """Volume interpolation based on pairwise interpolation between slices."""
 from __future__ import annotations
 
+import logging
 import warnings
 from abc import ABC, abstractmethod
 from math import ceil, log2
@@ -24,6 +25,8 @@ from torchvision.transforms import ToTensor
 
 from atlinter.data import GeneDataset
 from atlinter.utils import find_closest
+
+logger = logging.getLogger(__name__)
 
 
 class PairInterpolationModel(ABC):
