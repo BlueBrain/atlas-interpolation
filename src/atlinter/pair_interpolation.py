@@ -536,6 +536,7 @@ class GeneInterpolate:
         """
         # TODO: Try to change the implementation of the prediction so that
         # we do not predict slices that are not needed.
+        logger.info("Start predicting interpolation between two known slices")
         known_slices = sorted(self.gene_data.known_slices)
 
         all_interpolated_images = []
@@ -550,6 +551,9 @@ class GeneInterpolate:
                 continue
             all_interpolated_images.append(interpolated_images)
             all_predicted_section_numbers.append(predicted_section_numbers)
+
+            if i % 5 == 0:
+                logger.info(f"{i} / {len(known_slices) - 1} interpolations predicted")
 
         all_interpolated_images = np.concatenate(all_interpolated_images)
         all_predicted_section_numbers = np.concatenate(all_predicted_section_numbers)
@@ -591,6 +595,8 @@ class GeneInterpolate:
         volume_shape = self.gene_data.volume_shape
         volume = np.zeros(volume_shape)
 
+        logger.info(f"Start predicting the volume of shape {volume_shape}")
+
         if self.gene_data.axis == "sagittal":
             volume = np.moveaxis(volume, 2, 0)
         # Get all the predictions
@@ -604,6 +610,7 @@ class GeneInterpolate:
         end = volume_shape[0] if self.gene_data.axis == "coronal" else volume_shape[2]
 
         # Populate the volume
+        logger.info("Populate volume with interpolation predictions")
         for slice_number in range(end):
             # If the slice is known, just copy the gene.
             if slice_number in self.gene_data.known_slices:
@@ -621,6 +628,9 @@ class GeneInterpolate:
             else:
                 index = find_closest(slice_number, all_predicted_section_numbers)[0]
                 volume[slice_number] = all_interpolated_images[index]
+
+            if slice_number % 5 == 0:
+                logger.info(f"{slice_number} / {end} populated slices")
 
         if self.gene_data.axis == "sagittal":
             volume = np.moveaxis(volume, 0, 2)
