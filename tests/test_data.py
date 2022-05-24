@@ -45,6 +45,7 @@ class TestGeneData:
         assert gene_data.axis == axis
         assert gene_data.known_slices == sorted(known_slices)
         assert isinstance(gene_data.volume, np.ndarray)
+        assert gene_data.volume.dtype == "float32"
         assert gene_data.volume.shape == volume_shape
         assert isinstance(gene_data.unknown_slices, list)
         assert len(gene_data.unknown_slices) == end - len(known_slices)
