@@ -430,7 +430,7 @@ class GeneOpticalFlow:
             Entire gene volume. Array of shape of the volume ``GeneDataset``.
         """
         volume_shape = self.gene_volume.shape
-        volume = np.zeros(volume_shape)
+        volume = np.zeros(volume_shape, dtype="float32")
 
         # Populate the volume
         for slice_number in range(volume.shape[0]):

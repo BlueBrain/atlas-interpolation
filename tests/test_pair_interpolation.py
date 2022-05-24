@@ -299,6 +299,7 @@ class TestGeneInterpolate:
         gene_interpolate = GeneInterpolate(gene_data, FakeModel())
         predicted_volume = gene_interpolate.predict_volume()
         assert isinstance(predicted_volume, np.ndarray)
+        assert predicted_volume.dtype == "float32"
         assert np.all(predicted_volume.shape == volume_shape)
 
         if axis == "sagittal":
