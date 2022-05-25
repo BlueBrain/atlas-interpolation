@@ -430,8 +430,10 @@ class GeneOpticalFlow:
             Entire gene volume. Array of shape of the volume ``GeneDataset``.
         """
         volume_shape = self.gene_volume.shape
+        logger.info(f"Start predicting the volume of shape {volume_shape}")
         volume = np.zeros(volume_shape, dtype="float32")
 
+        logger.info("Populate the volume with interpolation predictions")
         # Populate the volume
         for slice_number in range(volume.shape[0]):
             # If the slice is known, just copy the gene.
@@ -440,6 +442,9 @@ class GeneOpticalFlow:
             # If the slice is unknown, predict it
             else:
                 volume[slice_number] = self.predict_slice(slice_number)
+
+            if slice_number % 5 == 0:
+                logger.info(f"{slice_number} / {volume.shape[0]} predicted slices")
 
         if self.gene_data.axis == "sagittal":
             volume = np.moveaxis(volume, 0, 2)
