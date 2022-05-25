@@ -589,7 +589,7 @@ class GeneInterpolate:
         This function might be slow.
         """
         volume_shape = self.gene_data.volume_shape
-        volume = np.zeros(volume_shape)
+        volume = np.zeros(volume_shape, dtype="float32")
 
         if self.gene_data.axis == "sagittal":
             volume = np.moveaxis(volume, 2, 0)

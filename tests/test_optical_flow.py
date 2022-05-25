@@ -249,6 +249,7 @@ class TestGeneOpticalFlow:
         )
         predicted_volume = gene_optical_flow.predict_volume()
         assert isinstance(predicted_volume, np.ndarray)
+        assert predicted_volume.dtype == "float32"
         assert predicted_volume.shape == volume_shape
         # Check that the known slices are kept in the volume
         if axis == "sagittal":

@@ -59,7 +59,7 @@ class GeneDataset:
         self.volume_shape = volume_shape
 
         # Create volume
-        self.volume = np.zeros(volume_shape)
+        self.volume = np.zeros(volume_shape, dtype="float32")
         end = volume_shape[0] if self.axis == "coronal" else volume_shape[2]
         slices = [s for s in self.known_slices if s < end]
 
