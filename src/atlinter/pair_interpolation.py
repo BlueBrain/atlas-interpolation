@@ -596,7 +596,7 @@ class GeneInterpolate:
         This function might be slow.
         """
         volume_shape = self.gene_data.volume_shape
-        volume = np.zeros(volume_shape)
+        volume = np.zeros(volume_shape, dtype="float32")
 
         logger.info(f"Start predicting the volume of shape {volume_shape}")
 

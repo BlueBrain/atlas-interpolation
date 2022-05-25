@@ -430,8 +430,8 @@ class GeneOpticalFlow:
             Entire gene volume. Array of shape of the volume ``GeneDataset``.
         """
         volume_shape = self.gene_volume.shape
-        volume = np.zeros(volume_shape)
         logger.info(f"Start predicting the volume of shape {volume_shape}")
+        volume = np.zeros(volume_shape, dtype="float32")
 
         logger.info("Populate the volume with interpolation predictions")
         # Populate the volume
