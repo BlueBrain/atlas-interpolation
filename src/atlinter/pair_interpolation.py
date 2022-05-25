@@ -285,10 +285,10 @@ class CAINPairInterpolationModel(PairInterpolationModel):
 
     The typical use is
     >>> from atlinter.vendor.cain.cain import CAIN
-    >>> device = "cuda" if torch.cuda.is_available else "cpu"
-    >>> cain_model = torch.nn.DataParallel(CAIN()).to(device)
+    >>> device = "cuda" if torch.cuda.is_available() else "cpu"
+    >>> cain_model = CAIN().to(device)
     >>> cain_checkpoint = torch.load("pretrained_cain.pth", map_location=device)
-    >>> cain_model.load_state_dict(cain_checkpoint["state_dict"])
+    >>> cain_model.load_state_dict(cain_checkpoint)
     >>> cain_interpolation_model = CAINPairInterpolationModel(cain_model)
 
     Parameters
