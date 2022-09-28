@@ -468,18 +468,22 @@ class GeneInterpolate:
         Gene Dataset to interpolate. It contains a `volume` of reference shape
         with all known places located at the right place and a `metadata` dictionary
         containing information about the axis of the dataset and the section numbers.
-
     model : PairInterpolationModel
         Pair-interpolation model.
+    border_predictions: boolean
+        If False, slices before the first and after the last known slice are
+        just background. Otherwise, a copy of the extremity slice is done.
     """
 
     def __init__(
         self,
         gene_data: GeneDataset,
         model: PairInterpolationModel,
+        border_predictions: bool = True,
     ):
         self.gene_data = gene_data
         self.model = model
+        self.border_predictions = border_predictions
 
         self.axis = self.gene_data.axis
         self.gene_volume = self.gene_data.volume.copy()
@@ -621,11 +625,13 @@ class GeneInterpolate:
             # If the slice section is smaller than all known slice
             # We copy-paste the smallest known slice.
             elif slice_number < min_slice_number:
-                volume[slice_number] = self.gene_volume[min_slice_number]
+                if self.border_predictions:
+                    volume[slice_number] = self.gene_volume[min_slice_number]
             # If the slice section is bigger than all known slice
             # We copy-paste the biggest known slice.
             elif slice_number > max_slice_number:
-                volume[slice_number] = self.gene_volume[max_slice_number]
+                if self.border_predictions:
+                    volume[slice_number] = self.gene_volume[max_slice_number]
             # If the slice is surrounded by two known slice.
             # Determine the prediction closest to the slice section.
             else:
