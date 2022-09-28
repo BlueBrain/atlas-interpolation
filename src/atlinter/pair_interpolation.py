@@ -623,12 +623,14 @@ class GeneInterpolate:
             if slice_number in self.gene_data.known_slices:
                 volume[slice_number] = self.gene_volume[slice_number]
             # If the slice section is smaller than all known slice
-            # We copy-paste the smallest known slice.
+            # We copy-paste the smallest known slice if border_predictions
+            # is True, else keep background slices.
             elif slice_number < min_slice_number:
                 if self.border_predictions:
                     volume[slice_number] = self.gene_volume[min_slice_number]
             # If the slice section is bigger than all known slice
-            # We copy-paste the biggest known slice.
+            # We copy-paste the biggest known slice if border_predictions
+            # is True, else keep background slices.
             elif slice_number > max_slice_number:
                 if self.border_predictions:
                     volume[slice_number] = self.gene_volume[max_slice_number]
