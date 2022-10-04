@@ -311,6 +311,20 @@ class TestGeneInterpolate:
         assert np.all(np.unique(predicted_volume[0:10]) == np.array([1]))
         assert np.all(predicted_volume[36:] == np.array([3]))
 
+        gene_interpolate = GeneInterpolate(
+            gene_data, FakeModel(), border_predictions=False
+        )
+        predicted_volume = gene_interpolate.predict_volume()
+
+        if axis == "sagittal":
+            if rgb:
+                predicted_volume = np.transpose(predicted_volume, (2, 0, 1, 3))
+            else:
+                predicted_volume = np.transpose(predicted_volume, (2, 0, 1))
+
+        assert np.all(np.unique(predicted_volume[0:10]) == np.array([0]))
+        assert np.all(predicted_volume[36:] == np.array([0]))
+
     def test_predict_volume_wrong_axis(self):
 
         gene_data = GeneDataset(
