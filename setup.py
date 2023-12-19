@@ -18,6 +18,7 @@ with open("README.md", encoding="utf-8") as fh:
     long_description = fh.read()
 
 install_requires = [
+    "importlib-metadata<5",
     "mxnet",
     "numpy",
     "pytorch-fid",
