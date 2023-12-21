@@ -441,8 +441,11 @@ class PairInterpolate:
         interpolated_images = self._repeated_interpolation(
             img1, img2, model, self.n_repeat
         )
-        interpolated_images = np.stack(interpolated_images)
-        interpolated_images = model.after_interpolation(interpolated_images)
+        if len(interpolated_images) != 0:
+            interpolated_images = np.stack(interpolated_images)
+            interpolated_images = model.after_interpolation(interpolated_images)
+        else:
+            interpolated_images = np.array(interpolated_images)
 
         return interpolated_images
 
